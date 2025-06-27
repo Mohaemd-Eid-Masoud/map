@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ZenZone Workspace Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Cairo Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .header-subtitle {
+            margin-top: 5px;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        #map {
+            height: calc(100vh - 100px);
+            width: 100%;
+        }
+        
+        .location-button {
+            position: fixed;
+            top: 120px;
+            right: 30px;
+            background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-size: 1.5rem;
+            z-index: 1000;
+        }
+        
+        .location-button:hover {
+            transform: scale(1.1);
+        }
+        
+        .stats-card {
+            position: fixed;
+            top: 120px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            min-width: 200px;
+        }
+        
+        .stats-title {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .stat-label {
+            color: #333;
+            font-size: 0.9rem;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: #5baa91;
+        }
+        
+        .direction-panel {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            min-width: 250px;
+            display: none;
+        }
+        
+        .direction-panel.show {
+            display: block;
+        }
+        
+        .direction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .direction-title {
+            font-weight: 700;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #333;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .close-btn:hover {
+            background: #ccc;
+        }
+        
+        .direction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 8px 0;
+        }
+        
+        .direction-label {
+            color: #333;
+            font-size: 0.9rem;
+        }
+        
+        .direction-value {
+            font-weight: 600;
+            color: #5baa91;
+        }
+        
+        .action-button {
+            display: inline-block;
+            width: 100%;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%);
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            margin-top: 10px;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Hide attribution */
+        .leaflet-control-attribution {
+            display: none !important;
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-card {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+            
+            .direction-panel {
+                position: relative;
+                bottom: auto;
+                left: auto;
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+            
+            .location-button {
+                top: auto;
+                bottom: 30px;
+                right: 30px;
+            }
+            
+            #map {
+                height: calc(100vh - 200px);
+            }
+        }
+        
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #5baa91, #4a8c7a);
+            border-radius: 50%;
+            box-shadow: 0 8px 25px rgba(91, 170, 145, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            border: none;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .fab:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(91, 170, 145, 0.6);
+        }
+        
+        .fab:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+        
+        /* FAB Menu */
+        .fab-menu {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 999;
+        }
+        
+        .fab-menu.active {
+            display: flex;
+            animation: slideInUp 0.3s ease-out;
+        }
+        
+        .fab-item {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            color: #5baa91;
+            font-size: 18px;
+        }
+        
+        .fab-item:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, #5baa91, #4a8c7a);
+            z-index: 1001;
+            transition: width 0.3s ease;
+        }
+        
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-left: 4px solid #5baa91;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1002;
+            max-width: 300px;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.success {
+            border-left-color: #4CAF50;
+        }
+        
+        .toast.error {
+            border-left-color: #F44336;
+        }
+        
+        .toast.warning {
+            border-left-color: #FF9800;
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #5baa91;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Pulse Animation */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(91, 170, 145, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(91, 170, 145, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(91, 170, 145, 0);
+            }
+        }
+        
+        /* Hover Effects */
+        .workspace-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .direction-item:hover {
+            background: rgba(91, 170, 145, 0.05);
+            border-radius: 8px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .fab {
+                bottom: 20px;
+                right: 20px;
+                width: 55px;
+                height: 55px;
+            }
+            
+            .fab-menu {
+                bottom: 85px;
+                right: 20px;
+            }
+            
+            .toast {
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+        }
+        
+        /* Real-time Tracking Panel */
+        .tracking-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 350px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            transform: translateX(-400px);
+            transition: transform 0.3s ease;
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        .tracking-panel.show {
+            transform: translateX(0);
+        }
+        
+        .tracking-content {
+            padding: 20px;
+        }
+        
+        .tracking-status {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border-left: 4px solid #5baa91;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #5baa91;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.tracking {
+            background: #28a745;
+            animation: pulse 1s infinite;
+        }
+        
+        .status-dot.paused {
+            background: #ffc107;
+            animation: none;
+        }
+        
+        .status-dot.error {
+            background: #dc3545;
+            animation: none;
+        }
+        
+        .tracking-info {
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .info-value {
+            font-weight: 700;
+            color: #5baa91;
+            font-size: 1rem;
+        }
+        
+        .navigation-instructions {
+            margin-bottom: 20px;
+        }
+        
+        .navigation-instructions h4 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        
+        .instruction-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #5baa91 0%, #4a8c7a 100%);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(91, 170, 145, 0.3);
+        }
+        
+        .instruction-icon {
+            font-size: 2rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .instruction-text {
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        
+        .tracking-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .track-btn {
+            flex: 1;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #5baa91 0%, #4a8c7a 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .track-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(91, 170, 145, 0.4);
+        }
+        
+        .track-btn.secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        }
+        
+        .track-btn.secondary:hover {
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+        }
+        
+        /* Tracking Path */
+        .tracking-path {
+            stroke: #dc3545;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            opacity: 0.8;
+        }
+        
+        /* Real-time Location Marker */
+        .realtime-marker {
+            background: #dc3545;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.3);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .tracking-panel {
+                width: calc(100vw - 40px);
+                left: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🌍 ZenZone Workspaces</h1>
+        <div class="header-subtitle">Discover amazing workspaces in Assuit</div>
+    </header>
+
+    <div class="stats-card">
+        <div class="stats-title">📊 Quick Stats</div>
+        <div class="stat-item">
+            <span class="stat-label">Workspaces</span>
+            <span class="stat-value" id="workspaceCount">4</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Nearest</span>
+            <span class="stat-value" id="nearestDistance">-</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Status</span>
+            <span class="stat-value" id="locationStatus">📍 Ready</span>
+        </div>
+        <div class="location-item">
+            <span class="location-label">Nearest Distance:</span>
+            <span class="location-value" id="nearestDistance">-</span>
+        </div>
+        <div class="location-item">
+            <span class="location-label">Accuracy:</span>
+            <span class="location-value" id="locationAccuracy">-</span>
+        </div>
+    </div>
+
+    <div class="direction-panel" id="directionPanel">
+        <div class="direction-header">
+            <div class="direction-title">🧭 Directions</div>
+            <button class="close-btn" onclick="closeDirectionPanel()">×</button>
+        </div>
+        <div class="direction-info" id="directionInfo">
+            <!-- Direction information will be populated here -->
+        </div>
+    </div>
+
+    <button class="location-button" id="getLocation" title="Get My Location">
+        📍
+    </button>
+
+    <div id="map"></div>
+    
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+    
+    <!-- Floating Action Button -->
+    <button class="fab" id="fab" onclick="toggleFabMenu()">
+        <span id="fabIcon">+</span>
+    </button>
+    
+    <!-- FAB Menu -->
+    <div class="fab-menu" id="fabMenu">
+        <button class="fab-item" onclick="getUserLocation()" title="Get My Location">
+            📍
+        </button>
+        <button class="fab-item" onclick="toggleTrackingPanel()" title="Live Navigation">
+            🧭
+        </button>
+        <button class="fab-item" onclick="clearRoute()" title="Clear Route">
+            🗑️
+        </button>
+        <button class="fab-item" onclick="fitToBounds()" title="Fit to View">
+            🔍
+        </button>
+        <button class="fab-item" onclick="toggleFullscreen()" title="Fullscreen">
+            ⛶
+        </button>
+    </div>
+
+    <!-- Real-time Tracking Panel -->
+    <div class="panel tracking-panel" id="trackingPanel">
+        <div class="panel-header">
+            <h3>🧭 Live Navigation</h3>
+            <button class="close-btn" onclick="stopTracking()">×</button>
+        </div>
+        <div class="tracking-content">
+            <div class="tracking-status" id="trackingStatus">
+                <div class="status-indicator">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">Ready to track</span>
+                </div>
+            </div>
+            
+            <div class="tracking-info">
+                <div class="info-item">
+                    <span class="info-label">Distance Remaining:</span>
+                    <span class="info-value" id="remainingDistance">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">ETA:</span>
+                    <span class="info-value" id="eta">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Speed:</span>
+                    <span class="info-value" id="currentSpeed">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Accuracy:</span>
+                    <span class="info-value" id="trackingAccuracy">-</span>
+                </div>
+            </div>
+            
+            <div class="navigation-instructions" id="navigationInstructions">
+                <h4>Next Turn</h4>
+                <div class="instruction-card" id="currentInstruction">
+                    <div class="instruction-icon">🚶</div>
+                    <div class="instruction-text">Start navigation to begin</div>
+                </div>
+            </div>
+            
+            <div class="tracking-controls">
+                <button class="track-btn" id="startTrackingBtn" onclick="startRealTimeTracking()">
+                    🚀 Start Navigation
+                </button>
+                <button class="track-btn secondary" onclick="pauseTracking()" id="pauseBtn" style="display: none;">
+                    ⏸️ Pause
+                </button>
+                <button class="track-btn secondary" onclick="resumeTracking()" id="resumeBtn" style="display: none;">
+                    ▶️ Resume
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // Simple initialization
+        console.log('Starting map initialization...');
+        
+        // Initialize map
+        const map = L.map('map').setView([27.1828, 31.1828], 12);
+        console.log('Map created');
+        
+        // Add tile layer
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '',
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(map);
+        console.log('Tile layer added');
+        
+        // Workspace data
+        const workspaces = [
+            {
+                id: 1,
+                name: "ZenZone Downtown",
+                lat: 27.1828,
+                lng: 31.1828,
+                description: "Modern workspace in the heart of Assuit with high-speed internet and meeting rooms.",
+                badge: "Premium"
+            },
+            {
+                id: 2,
+                name: "ZenZone University",
+                lat: 27.1750,
+                lng: 31.1900,
+                description: "Perfect for students and academics near Assuit University campus.",
+                badge: "Student"
+            },
+            {
+                id: 3,
+                name: "ZenZone Mall",
+                lat: 27.1950,
+                lng: 31.1700,
+                description: "Convenient location near shopping centers with 24/7 access.",
+                badge: "24/7"
+            },
+            {
+                id: 4,
+                name: "ZenZone Industrial",
+                lat: 27.1600,
+                lng: 31.2000,
+                description: "Industrial area workspace with parking and security.",
+                badge: "Secure"
+            }
+        ];
+        
+        let userLocation = null;
+        let userMarker = null;
+        let selectedWorkspace = null;
+        let routePolyline = null;
+        let routeMarkers = [];
+        let locationWatchId = null;
+        let locationAccuracy = null;
+        let isTracking = false;
+        let trackingPath = [];
+        let trackingPolyline = null;
+        let currentRouteIndex = 0;
+        let routeInstructions = [];
+        
+        // Custom workspace icon
+        const workspaceIcon = L.divIcon({
+            html: `<div style="background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(91, 170, 145, 0.4); border: 3px solid white;"><span style="color: white; font-size: 18px;">🏢</span></div>`,
+            className: 'custom-div-icon',
+            iconSize: [40, 40],
+            iconAnchor: [20, 20],
+            popupAnchor: [0, -20]
+        });
+        
+        // User location icon
+        const userLocationIcon = L.divIcon({
+            html: `<div style="background: linear-gradient(135deg, rgba(102, 161, 133, 1) 0%, #4a9980 100%); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(102, 161, 133, 0.4); border: 3px solid white;"><span style="color: white; font-size: 16px;">📍</span></div>`,
+            className: 'user-location-icon',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+        
+        // Add workspaces to map
+        workspaces.forEach(ws => {
+            const marker = L.marker([ws.lat, ws.lng], { icon: workspaceIcon }).addTo(map);
+            ws.marker = marker;
+            
+            // Add enhanced click handler
+            addWorkspaceClickHandler(ws, marker);
+            
+            marker.bindPopup(`
+                <div style="font-family: 'Cairo', sans-serif; min-width: 250px;">
+                    <div style="background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%); margin: -15px -15px 10px -15px; padding: 15px; color: white; border-radius: 8px 8px 0 0;">
+                        <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 5px;">${ws.name}</div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; display: inline-block;">${ws.badge}</div>
+                    </div>
+                    <div style="margin-bottom: 10px; line-height: 1.4;">${ws.description}</div>
+                    <button onclick="showDirectionPanelById(${ws.id})" style="width: 100%; padding: 8px 16px; background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: 600;">🧭 Get Directions</button>
+                </div>
+            `);
+        });
+        
+        console.log('Workspaces added to map');
+        
+        // Calculate distance function
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+        
+        // Format distance function
+        function formatDistance(distance) {
+            if (distance < 1) {
+                return `${Math.round(distance * 1000)}m`;
+            } else {
+                return `${distance.toFixed(1)}km`;
+            }
+        }
+        
+        // Get bearing function
+        function getBearing(lat1, lon1, lat2, lon2) {
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const lat1Rad = lat1 * Math.PI / 180;
+            const lat2Rad = lat2 * Math.PI / 180;
+            
+            const y = Math.sin(dLon) * Math.cos(lat2Rad);
+            const x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
+            
+            let bearing = Math.atan2(y, x) * 180 / Math.PI;
+            bearing = (bearing + 360) % 360;
+            
+            return bearing;
+        }
+        
+        // Get direction name function
+        function getDirectionName(bearing) {
+            const directions = ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest'];
+            const index = Math.round(bearing / 45) % 8;
+            return directions[index];
+        }
+        
+        // Show direction panel function
+        function showDirectionPanel(workspace) {
+            if (!userLocation) {
+                showToast('Please get your location first to see directions.', 'warning');
+                return;
+            }
+            
+            selectedWorkspace = workspace;
+            const distance = calculateDistance(userLocation[0], userLocation[1], workspace.lat, workspace.lng);
+            const bearing = getBearing(userLocation[0], userLocation[1], workspace.lat, workspace.lng);
+            const direction = getDirectionName(bearing);
+            
+            // Create street-level route
+            createStreetRoute(userLocation, [workspace.lat, workspace.lng]);
+            
+            const directionInfo = document.getElementById('directionInfo');
+            directionInfo.innerHTML = `
+                <div class="direction-item">
+                    <span class="direction-label">Direct Distance:</span>
+                    <span class="direction-value">${formatDistance(distance)}</span>
+                </div>
+                <div class="direction-item">
+                    <span class="direction-label">Direction:</span>
+                    <span class="direction-value">${direction}</span>
+                </div>
+                <div class="direction-item">
+                    <span class="direction-label">Bearing:</span>
+                    <span class="direction-value">${Math.round(bearing)}°</span>
+                </div>
+                <div class="direction-item">
+                    <span class="direction-label">Coordinates:</span>
+                    <span class="direction-value">${workspace.lat.toFixed(4)}, ${workspace.lng.toFixed(4)}</span>
+                </div>
+            `;
+            
+            document.getElementById('directionPanel').classList.add('show');
+            
+            // Show tracking panel option
+            showToast(`Street route to ${workspace.name} ready! Click 🧭 for live navigation`, 'success');
+        }
+        
+        // Create route function
+        function createRoute(start, end) {
+            // Clear previous route
+            if (routePolyline) {
+                map.removeLayer(routePolyline);
+            }
+            routeMarkers.forEach(marker => map.removeLayer(marker));
+            routeMarkers = [];
+            
+            // Show loading state
+            const directionInfo = document.getElementById('directionInfo');
+            directionInfo.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading-spinner"></div><br>Calculating street route...</div>';
+            showProgress(30);
+            showToast('Calculating street route...', 'info');
+            
+            // Use OSRM (Open Source Routing Machine) for real street routing
+            const apiUrl = `https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson&steps=true`;
+            
+            fetch(apiUrl)
+            .then(response => {
+                showProgress(60);
+                if (!response.ok) {
+                    throw new Error('Routing API failed');
+                }
+                return response.json();
+            })
+            .then(data => {
+                showProgress(90);
+                if (data.routes && data.routes.length > 0) {
+                    const route = data.routes[0];
+                    const coordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]); // Convert to [lat, lng]
+                    
+                    // Create polyline for the route
+                    routePolyline = L.polyline(coordinates, {
+                        color: '#5baa91',
+                        weight: 8,
+                        opacity: 0.9,
+                        dashArray: '15, 8',
+                        lineCap: 'round',
+                        lineJoin: 'round'
+                    }).addTo(map);
+                    
+                    // Add direction arrows along the route
+                    for (let i = 0; i < coordinates.length - 1; i += Math.max(1, Math.floor(coordinates.length / 10))) {
+                        const point = coordinates[i];
+                        const nextPoint = coordinates[i + 1];
+                        const bearing = getBearing(point[0], point[1], nextPoint[0], nextPoint[1]);
+                        
+                        const arrowIcon = L.divIcon({
+                            html: `<div style="transform: rotate(${bearing}deg); color: #5baa91; font-size: 20px; background: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">➤</div>`,
+                            className: 'route-arrow',
+                            iconSize: [24, 24],
+                            iconAnchor: [12, 12]
+                        });
+                        
+                        const arrowMarker = L.marker(point, { icon: arrowIcon }).addTo(map);
+                        routeMarkers.push(arrowMarker);
+                    }
+                    
+                    // Fit map to show entire route
+                    const bounds = L.latLngBounds(coordinates);
+                    map.fitBounds(bounds, { padding: [20, 20] });
+                    
+                    // Update direction info with real route data
+                    const distance = route.distance / 1000; // Convert to km
+                    const duration = route.duration / 60; // Convert to minutes
+                    
+                    const directionInfo = document.getElementById('directionInfo');
+                    directionInfo.innerHTML = `
+                        <div class="direction-item">
+                            <span class="direction-label">Street Route Distance:</span>
+                            <span class="direction-value">${formatDistance(distance)}</span>
+                        </div>
+                        <div class="direction-item">
+                            <span class="direction-label">Estimated Time:</span>
+                            <span class="direction-value">${Math.round(duration)} min</span>
+                        </div>
+                        <div class="direction-item">
+                            <span class="direction-label">Route Type:</span>
+                            <span class="direction-value">Street Navigation</span>
+                        </div>
+                        <div class="direction-item">
+                            <span class="direction-label">Coordinates:</span>
+                            <span class="direction-value">${end[0].toFixed(4)}, ${end[1].toFixed(4)}</span>
+                        </div>
+                    `;
+                    
+                    showProgress(100);
+                    setTimeout(hideProgress, 500);
+                    showToast('Street route calculated successfully!', 'success');
+                } else {
+                    throw new Error('No route found');
+                }
+            })
+            .catch(error => {
+                console.error('Routing error:', error);
+                hideProgress();
+                showToast('Using fallback route - street data unavailable', 'warning');
+                
+                // Fallback to simple straight line route
+                const waypoints = [start, end];
+                routePolyline = L.polyline(waypoints, {
+                    color: '#5baa91',
+                    weight: 8,
+                    opacity: 0.9,
+                    dashArray: '15, 8',
+                    lineCap: 'round',
+                    lineJoin: 'round'
+                }).addTo(map);
+                
+                const bounds = L.latLngBounds(waypoints);
+                map.fitBounds(bounds, { padding: [20, 20] });
+                
+                // Show fallback info
+                const distance = calculateDistance(start[0], start[1], end[0], end[1]);
+                const bearing = getBearing(start[0], start[1], end[0], end[1]);
+                const direction = getDirectionName(bearing);
+                
+                const directionInfo = document.getElementById('directionInfo');
+                directionInfo.innerHTML = `
+                    <div class="direction-item">
+                        <span class="direction-label">Direct Distance:</span>
+                        <span class="direction-value">${formatDistance(distance)}</span>
+                    </div>
+                    <div class="direction-item">
+                        <span class="direction-label">Direction:</span>
+                        <span class="direction-value">${direction}</span>
+                    </div>
+                    <div class="direction-item">
+                        <span class="direction-label">Bearing:</span>
+                        <span class="direction-value">${Math.round(bearing)}°</span>
+                    </div>
+                    <div class="direction-item">
+                        <span class="direction-label">Coordinates:</span>
+                        <span class="direction-value">${end[0].toFixed(4)}, ${end[1].toFixed(4)}</span>
+                    </div>
+                `;
+            });
+        }
+        
+        // Show direction panel by ID function
+        function showDirectionPanelById(workspaceId) {
+            const workspace = workspaces.find(ws => ws.id === workspaceId);
+            if (workspace) {
+                showDirectionPanel(workspace);
+            }
+        }
+        
+        // Close direction panel function
+        function closeDirectionPanel() {
+            document.getElementById('directionPanel').classList.remove('show');
+            selectedWorkspace = null;
+            
+            // Clear route from map
+            if (routePolyline) {
+                map.removeLayer(routePolyline);
+                routePolyline = null;
+            }
+            routeMarkers.forEach(marker => map.removeLayer(marker));
+            routeMarkers = [];
+        }
+        
+        // Get user location function
+        function getUserLocation() {
+            const button = document.getElementById('getLocation');
+            const statusElement = document.getElementById('locationStatus');
+            
+            button.disabled = true;
+            button.textContent = '⏳';
+            statusElement.textContent = '⏳ Locating...';
+            showProgress(25);
+            showToast('Getting your location...', 'info');
+            
+            if (navigator.geolocation) {
+                const options = {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0
+                };
+                
+                // Get initial position
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        updateUserLocation(position);
+                        button.textContent = '📍';
+                        button.disabled = false;
+                        statusElement.textContent = '✅ Located';
+                        showProgress(100);
+                        setTimeout(hideProgress, 500);
+                        showToast('Location found!', 'success');
+                        
+                        // Start continuous tracking
+                        startLocationTracking();
+                    },
+                    function(error) {
+                        handleLocationError(error);
+                        button.textContent = '📍';
+                        button.disabled = false;
+                        statusElement.textContent = '❌ Error';
+                        hideProgress();
+                        showToast('Location access denied', 'error');
+                    },
+                    options
+                );
+            } else {
+                alert('Geolocation is not supported by this browser.');
+                button.textContent = '📍';
+                button.disabled = false;
+                statusElement.textContent = '❌ Not Supported';
+                hideProgress();
+                showToast('Geolocation not supported', 'error');
+            }
+        }
+        
+        // Update user location
+        function updateUserLocation(position) {
+            userLocation = [position.coords.latitude, position.coords.longitude];
+            locationAccuracy = position.coords.accuracy;
+            
+            if (userMarker) {
+                map.removeLayer(userMarker);
+            }
+            userMarker = L.marker(userLocation, { icon: userLocationIcon }).addTo(map);
+            
+            // Add accuracy circle
+            if (locationAccuracy) {
+                const accuracyCircle = L.circle(userLocation, {
+                    radius: locationAccuracy,
+                    color: '#5baa91',
+                    fillColor: '#5baa91',
+                    fillOpacity: 0.1,
+                    weight: 1
+                }).addTo(map);
+                
+                // Remove accuracy circle after 3 seconds
+                setTimeout(() => {
+                    map.removeLayer(accuracyCircle);
+                }, 3000);
+            }
+            
+            // Update nearest distance
+            let nearestDistance = Infinity;
+            workspaces.forEach(ws => {
+                const distance = calculateDistance(userLocation[0], userLocation[1], ws.lat, ws.lng);
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                }
+            });
+            document.getElementById('nearestDistance').textContent = formatDistance(nearestDistance);
+            
+            // Update accuracy display
+            const accuracyElement = document.getElementById('locationAccuracy');
+            if (accuracyElement && locationAccuracy) {
+                accuracyElement.textContent = `±${Math.round(locationAccuracy)}m`;
+                accuracyElement.style.color = locationAccuracy < 10 ? '#4CAF50' : locationAccuracy < 50 ? '#FF9800' : '#F44336';
+            }
+        }
+        
+        // Start continuous location tracking
+        function startLocationTracking() {
+            if (locationWatchId) {
+                navigator.geolocation.clearWatch(locationWatchId);
+            }
+            
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 30000 // Update every 30 seconds max
+            };
+            
+            locationWatchId = navigator.geolocation.watchPosition(
+                function(position) {
+                    updateUserLocation(position);
+                },
+                function(error) {
+                    console.warn('Location tracking error:', error);
+                },
+                options
+            );
+        }
+        
+        // Handle location errors
+        function handleLocationError(error) {
+            console.error('Error getting location:', error);
+            let errorMessage = 'Unable to get your location. ';
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage += 'Please allow location access in your browser settings.';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage += 'Location information is unavailable.';
+                    break;
+                case error.TIMEOUT:
+                    errorMessage += 'Location request timed out.';
+                    break;
+                default:
+                    errorMessage += 'Please check your browser settings.';
+            }
+            alert(errorMessage);
+        }
+        
+        // Add event listener to location button
+        document.getElementById('getLocation').addEventListener('click', getUserLocation);
+        
+        // Initialize stats
+        document.getElementById('workspaceCount').textContent = workspaces.length;
+        
+        // Make functions globally available
+        window.showDirectionPanel = showDirectionPanel;
+        window.showDirectionPanelById = showDirectionPanelById;
+        window.closeDirectionPanel = closeDirectionPanel;
+        
+        console.log('Map initialization complete!');
+        
+        // Cleanup function
+        function cleanup() {
+            if (locationWatchId) {
+                navigator.geolocation.clearWatch(locationWatchId);
+                locationWatchId = null;
+            }
+        }
+        
+        // Add cleanup on page unload
+        window.addEventListener('beforeunload', cleanup);
+        
+        // Initialize map
+        initMap();
+        
+        // Show welcome message
+        setTimeout(() => {
+            showToast('Welcome to Cairo Workspaces! 🎉', 'success', 4000);
+        }, 1000);
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                // Close FAB menu
+                const fabMenu = document.getElementById('fabMenu');
+                if (fabMenu.classList.contains('active')) {
+                    toggleFabMenu();
+                }
+                // Close direction panel
+                const directionPanel = document.getElementById('directionPanel');
+                if (directionPanel.classList.contains('show')) {
+                    closeDirectionPanel();
+                }
+            }
+            if (e.key === 'l' || e.key === 'L') {
+                getUserLocation();
+            }
+            if (e.key === 'f' || e.key === 'F') {
+                fitToBounds();
+            }
+        });
+        
+        // UX Enhancement Functions
+        
+        // FAB Menu Toggle
+        function toggleFabMenu() {
+            const fabMenu = document.getElementById('fabMenu');
+            const fabIcon = document.getElementById('fabIcon');
+            
+            if (fabMenu.classList.contains('active')) {
+                fabMenu.classList.remove('active');
+                fabIcon.textContent = '+';
+            } else {
+                fabMenu.classList.add('active');
+                fabIcon.textContent = '×';
+            }
+        }
+        
+        // Toast Notification System
+        function showToast(message, type = 'info', duration = 3000) {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span>${getToastIcon(type)}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Show toast
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Hide and remove toast
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, duration);
+        }
+        
+        function getToastIcon(type) {
+            switch(type) {
+                case 'success': return '✅';
+                case 'error': return '❌';
+                case 'warning': return '⚠️';
+                default: return 'ℹ️';
+            }
+        }
+        
+        // Progress Bar
+        function showProgress(progress) {
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = `${progress}%`;
+        }
+        
+        function hideProgress() {
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = '0%';
+        }
+        
+        // Clear Route Function
+        function clearRoute() {
+            if (routePolyline) {
+                map.removeLayer(routePolyline);
+                routePolyline = null;
+            }
+            routeMarkers.forEach(marker => map.removeLayer(marker));
+            routeMarkers = [];
+            
+            const directionInfo = document.getElementById('directionInfo');
+            directionInfo.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">Click on a workspace to get directions</div>';
+            
+            showToast('Route cleared', 'success');
+            toggleFabMenu();
+        }
+        
+        // Fit to Bounds Function
+        function fitToBounds() {
+            if (userLocation && workspaces.length > 0) {
+                const bounds = L.latLngBounds([userLocation]);
+                workspaces.forEach(ws => {
+                    bounds.extend([ws.lat, ws.lng]);
+                });
+                map.fitBounds(bounds, { padding: [20, 20] });
+                showToast('Map fitted to all locations', 'success');
+            } else if (workspaces.length > 0) {
+                const bounds = L.latLngBounds();
+                workspaces.forEach(ws => {
+                    bounds.extend([ws.lat, ws.lng]);
+                });
+                map.fitBounds(bounds, { padding: [20, 20] });
+                showToast('Map fitted to workspaces', 'success');
+            } else {
+                showToast('No locations to fit', 'warning');
+            }
+            toggleFabMenu();
+        }
+        
+        // Fullscreen Toggle
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    showToast('Entered fullscreen mode', 'success');
+                }).catch(err => {
+                    showToast('Fullscreen not supported', 'error');
+                });
+            } else {
+                document.exitFullscreen().then(() => {
+                    showToast('Exited fullscreen mode', 'success');
+                });
+            }
+            toggleFabMenu();
+        }
+        
+        // Enhanced Click Handlers
+        function addWorkspaceClickHandler(workspace, marker) {
+            marker.on('click', function() {
+                // Add pulse effect to clicked marker
+                marker.getElement().classList.add('pulse');
+                setTimeout(() => {
+                    marker.getElement().classList.remove('pulse');
+                }, 2000);
+                
+                if (userLocation) {
+                    showProgress(50);
+                    createRoute(userLocation, [workspace.lat, workspace.lng]);
+                    showProgress(100);
+                    setTimeout(hideProgress, 500);
+                    showToast(`Route to ${workspace.name} created`, 'success');
+                } else {
+                    showToast('Please get your location first', 'warning');
+                }
+            });
+        }
+        
+        // Real-time Tracking Functions
+        
+        // Toggle tracking panel
+        function toggleTrackingPanel() {
+            const trackingPanel = document.getElementById('trackingPanel');
+            if (trackingPanel.classList.contains('show')) {
+                trackingPanel.classList.remove('show');
+                toggleFabMenu();
+            } else {
+                trackingPanel.classList.add('show');
+                toggleFabMenu();
+            }
+        }
+        
+        // Start real-time tracking
+        function startRealTimeTracking() {
+            if (!userLocation || !selectedWorkspace) {
+                showToast('Please get your location and select a destination first', 'warning');
+                return;
+            }
+            
+            isTracking = true;
+            trackingPath = [userLocation];
+            currentRouteIndex = 0;
+            
+            // Update UI
+            document.getElementById('startTrackingBtn').style.display = 'none';
+            document.getElementById('pauseBtn').style.display = 'block';
+            document.getElementById('resumeBtn').style.display = 'none';
+            document.getElementById('statusDot').className = 'status-dot tracking';
+            document.getElementById('statusText').textContent = 'Live tracking active';
+            
+            // Create tracking polyline
+            if (trackingPolyline) {
+                map.removeLayer(trackingPolyline);
+            }
+            trackingPolyline = L.polyline(trackingPath, {
+                color: '#dc3545',
+                weight: 4,
+                opacity: 0.8,
+                dashArray: '10, 5'
+            }).addTo(map);
+            
+            // Update user marker for tracking
+            if (userMarker) {
+                map.removeLayer(userMarker);
+            }
+            userMarker = L.marker(userLocation, { 
+                icon: L.divIcon({
+                    html: `<div style="background: #dc3545; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.3);"></div>`,
+                    className: 'realtime-marker',
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
+                })
+            }).addTo(map);
+            
+            // Start high-frequency location updates
+            startHighFrequencyTracking();
+            
+            // Generate route instructions
+            generateRouteInstructions();
+            
+            showToast('Live navigation started!', 'success');
+        }
+        
+        // Start high-frequency location tracking
+        function startHighFrequencyTracking() {
+            if (locationWatchId) {
+                navigator.geolocation.clearWatch(locationWatchId);
+            }
+            
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            };
+            
+            locationWatchId = navigator.geolocation.watchPosition(
+                function(position) {
+                    updateRealTimeLocation(position);
+                },
+                function(error) {
+                    console.warn('High-frequency tracking error:', error);
+                    document.getElementById('statusDot').className = 'status-dot error';
+                    document.getElementById('statusText').textContent = 'Tracking error';
+                },
+                options
+            );
+        }
+        
+        // Update real-time location
+        function updateRealTimeLocation(position) {
+            const newLocation = [position.coords.latitude, position.coords.longitude];
+            const accuracy = position.coords.accuracy;
+            const speed = position.coords.speed || 0;
+            
+            // Update user location
+            userLocation = newLocation;
+            
+            // Add to tracking path
+            trackingPath.push(newLocation);
+            
+            // Update tracking polyline
+            if (trackingPolyline) {
+                trackingPolyline.setLatLngs(trackingPath);
+            }
+            
+            // Update user marker
+            if (userMarker) {
+                userMarker.setLatLng(newLocation);
+            }
+            
+            // Update tracking info
+            updateTrackingInfo(newLocation, accuracy, speed);
+            
+            // Check if we're near the destination
+            checkDestinationProximity(newLocation);
+            
+            // Update navigation instructions
+            updateNavigationInstructions(newLocation);
+            
+            // Keep map centered on user
+            map.setView(newLocation, map.getZoom());
+        }
+        
+        // Update tracking information
+        function updateTrackingInfo(currentLocation, accuracy, speed) {
+            if (selectedWorkspace) {
+                const remainingDistance = calculateDistance(
+                    currentLocation[0], currentLocation[1],
+                    selectedWorkspace.lat, selectedWorkspace.lng
+                );
+                
+                const estimatedSpeed = speed * 3.6; // Convert m/s to km/h
+                const eta = estimatedSpeed > 0 ? remainingDistance / estimatedSpeed * 60 : 0;
+                
+                document.getElementById('remainingDistance').textContent = formatDistance(remainingDistance);
+                document.getElementById('eta').textContent = eta > 0 ? `${Math.round(eta)} min` : '-';
+                document.getElementById('currentSpeed').textContent = estimatedSpeed > 0 ? `${Math.round(estimatedSpeed)} km/h` : '-';
+                document.getElementById('trackingAccuracy').textContent = `±${Math.round(accuracy)}m`;
+            }
+        }
+        
+        // Check destination proximity
+        function checkDestinationProximity(currentLocation) {
+            if (selectedWorkspace) {
+                const distance = calculateDistance(
+                    currentLocation[0], currentLocation[1],
+                    selectedWorkspace.lat, selectedWorkspace.lng
+                );
+                
+                if (distance < 0.05) { // Within 50 meters
+                    showToast('🎉 You have arrived at your destination!', 'success');
+                    stopTracking();
+                }
+            }
+        }
+        
+        // Generate route instructions
+        function generateRouteInstructions() {
+            if (!routePolyline || !selectedWorkspace) return;
+            
+            const routeCoords = routePolyline.getLatLngs();
+            routeInstructions = [];
+            
+            for (let i = 0; i < routeCoords.length - 1; i++) {
+                const current = routeCoords[i];
+                const next = routeCoords[i + 1];
+                const bearing = getBearing(current.lat, current.lng, next.lat, next.lng);
+                const distance = calculateDistance(current.lat, current.lng, next.lat, next.lng);
+                
+                if (distance > 0.1) { // Only add significant turns
+                    routeInstructions.push({
+                        lat: current.lat,
+                        lng: current.lng,
+                        bearing: bearing,
+                        distance: distance,
+                        instruction: getTurnInstruction(bearing)
+                    });
+                }
+            }
+        }
+        
+        // Get turn instruction
+        function getTurnInstruction(bearing) {
+            const directions = ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest'];
+            const index = Math.round(bearing / 45) % 8;
+            return `Continue ${directions[index]}`;
+        }
+        
+        // Update navigation instructions
+        function updateNavigationInstructions(currentLocation) {
+            if (routeInstructions.length === 0) return;
+            
+            // Find nearest instruction point
+            let nearestInstruction = null;
+            let minDistance = Infinity;
+            
+            routeInstructions.forEach((instruction, index) => {
+                const distance = calculateDistance(
+                    currentLocation[0], currentLocation[1],
+                    instruction.lat, instruction.lng
+                );
+                
+                if (distance < minDistance && distance < 0.1) { // Within 100 meters
+                    minDistance = distance;
+                    nearestInstruction = { ...instruction, index };
+                }
+            });
+            
+            if (nearestInstruction) {
+                const instructionCard = document.getElementById('currentInstruction');
+                const icon = getDirectionIcon(nearestInstruction.bearing);
+                
+                instructionCard.innerHTML = `
+                    <div class="instruction-icon">${icon}</div>
+                    <div class="instruction-text">${nearestInstruction.instruction}</div>
+                `;
+                
+                // Remove this instruction from the list
+                routeInstructions.splice(nearestInstruction.index, 1);
+            }
+        }
+        
+        // Get direction icon
+        function getDirectionIcon(bearing) {
+            const normalizedBearing = (bearing + 360) % 360;
+            
+            if (normalizedBearing >= 315 || normalizedBearing < 45) return '⬆️';
+            if (normalizedBearing >= 45 && normalizedBearing < 135) return '➡️';
+            if (normalizedBearing >= 135 && normalizedBearing < 225) return '⬇️';
+            if (normalizedBearing >= 225 && normalizedBearing < 315) return '⬅️';
+            
+            return '🚶';
+        }
+        
+        // Pause tracking
+        function pauseTracking() {
+            isTracking = false;
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('resumeBtn').style.display = 'block';
+            document.getElementById('statusDot').className = 'status-dot paused';
+            document.getElementById('statusText').textContent = 'Tracking paused';
+            showToast('Navigation paused', 'warning');
+        }
+        
+        // Resume tracking
+        function resumeTracking() {
+            isTracking = true;
+            document.getElementById('pauseBtn').style.display = 'block';
+            document.getElementById('resumeBtn').style.display = 'none';
+            document.getElementById('statusDot').className = 'status-dot tracking';
+            document.getElementById('statusText').textContent = 'Live tracking active';
+            showToast('Navigation resumed', 'success');
+        }
+        
+        // Stop tracking
+        function stopTracking() {
+            isTracking = false;
+            
+            // Reset UI
+            document.getElementById('startTrackingBtn').style.display = 'block';
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('resumeBtn').style.display = 'none';
+            document.getElementById('statusDot').className = 'status-dot';
+            document.getElementById('statusText').textContent = 'Ready to track';
+            
+            // Reset tracking info
+            document.getElementById('remainingDistance').textContent = '-';
+            document.getElementById('eta').textContent = '-';
+            document.getElementById('currentSpeed').textContent = '-';
+            document.getElementById('trackingAccuracy').textContent = '-';
+            
+            // Reset instruction
+            document.getElementById('currentInstruction').innerHTML = `
+                <div class="instruction-icon">🚶</div>
+                <div class="instruction-text">Start navigation to begin</div>
+            `;
+            
+            // Remove tracking polyline
+            if (trackingPolyline) {
+                map.removeLayer(trackingPolyline);
+                trackingPolyline = null;
+            }
+            
+            // Reset user marker
+            if (userMarker) {
+                map.removeLayer(userMarker);
+            }
+            userMarker = L.marker(userLocation, { icon: userLocationIcon }).addTo(map);
+            
+            // Hide tracking panel
+            document.getElementById('trackingPanel').classList.remove('show');
+            
+            // Restart normal location tracking
+            startLocationTracking();
+            
+            showToast('Navigation stopped', 'info');
+        }
+
+        // Alternative street routing with MapBox
+        function createStreetRoute(start, end) {
+            // MapBox Directions API (free tier)
+            const apiUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${start[1]},${start[0]};${end[1]},${end[0]}?geometries=geojson&access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw`;
+            
+            fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('MapBox API failed');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.routes && data.routes.length > 0) {
+                    const route = data.routes[0];
+                    const coordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+                    
+                    // Create street-level polyline
+                    routePolyline = L.polyline(coordinates, {
+                        color: '#5baa91',
+                        weight: 8,
+                        opacity: 0.9,
+                        dashArray: '15, 8',
+                        lineCap: 'round',
+                        lineJoin: 'round'
+                    }).addTo(map);
+                    
+                    // Add street-level direction arrows
+                    for (let i = 0; i < coordinates.length - 1; i += Math.max(1, Math.floor(coordinates.length / 15))) {
+                        const point = coordinates[i];
+                        const nextPoint = coordinates[i + 1];
+                        const bearing = getBearing(point[0], point[1], nextPoint[0], nextPoint[1]);
+                        
+                        const arrowIcon = L.divIcon({
+                            html: `<div style="transform: rotate(${bearing}deg); color: #5baa91; font-size: 18px; background: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">➤</div>`,
+                            className: 'route-arrow',
+                            iconSize: [22, 22],
+                            iconAnchor: [11, 11]
+                        });
+                        
+                        const arrowMarker = L.marker(point, { icon: arrowIcon }).addTo(map);
+                        routeMarkers.push(arrowMarker);
+                    }
+                    
+                    // Fit map to show entire route
+                    const bounds = L.latLngBounds(coordinates);
+                    map.fitBounds(bounds, { padding: [20, 20] });
+                    
+                    // Update with street route info
+                    const distance = route.distance / 1000;
+                    const duration = route.duration / 60;
+                    
+                    const directionInfo = document.getElementById('directionInfo');
+                    directionInfo.innerHTML = `
+                        <div class="direction-item">
+                            <span class="direction-label">Street Route Distance:</span>
+                            <span class="direction-value">${formatDistance(distance)}</span>
+                        </div>
+                        <div class="direction-item">
+                            <span class="direction-label">Estimated Time:</span>
+                            <span class="direction-value">${Math.round(duration)} min</span>
+                        </div>
+                        <div class="direction-item">
+                            <span class="direction-label">Route Type:</span>
+                            <span class="direction-value">Street Navigation</span>
+                        </div>
+                        <div class="direction-item">
+                            <span class="direction-label">Coordinates:</span>
+                            <span class="direction-value">${end[0].toFixed(4)}, ${end[1].toFixed(4)}</span>
+                        </div>
+                    `;
+                    
+                    showProgress(100);
+                    setTimeout(hideProgress, 500);
+                    showToast('Street route calculated successfully!', 'success');
+                }
+            })
+            .catch(error => {
+                console.error('MapBox routing error:', error);
+                // Fall back to OSRM
+                createRoute(start, end);
+            });
+        }
+    </script>
+</body>
+</html> 
