@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-    <title>ZenZone Workspace Map</title>
+    <title>خريطة مساحات العمل - ZenZone</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -17,6 +17,8 @@
             margin: 0;
             padding: 0;
             background: #ffffff;
+            direction: rtl;
+            text-align: right;
         }
         
         header {
@@ -46,7 +48,7 @@
         .location-button {
             position: fixed;
             top: 120px;
-            right: 30px;
+            left: 30px;
             background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%);
             color: white;
             border: none;
@@ -63,47 +65,446 @@
             transform: scale(1.1);
         }
         
+        /* Collapsible Quick Stats Panel */
         .stats-card {
             position: fixed;
-            top: 120px;
-            left: 30px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            top: 100px;
+            right: 15px;
+            width: 380px;
             z-index: 1000;
-            min-width: 200px;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(0);
+            max-height: calc(100vh - 140px);
+            overflow: hidden;
         }
         
-        .stats-title {
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
+        .stats-card.collapsed {
+            transform: translateX(100%);
         }
         
-        .stat-item {
+        .stats-card.expanded {
+            transform: translateX(0);
+        }
+        
+        /* Toggle Button */
+        .stats-toggle {
+            position: fixed;
+            top: 120px;
+            right: 15px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #5baa91 0%, #4a8c7a 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: 0 4px 15px rgba(91, 170, 145, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stats-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(91, 170, 145, 0.4);
+        }
+        
+        .stats-toggle.collapsed {
+            right: 15px;
+        }
+        
+        .stats-toggle.expanded {
+            right: 395px;
+        }
+        
+        /* Panel Header */
+        .panel-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding: 20px 20px 15px 20px;
+            border-bottom: 2px solid #f0f0f0;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 16px 16px 0 0;
         }
         
-        .stat-item:last-child {
-            border-bottom: none;
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+        
+        .panel-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .panel-close:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+        
+        /* Panel Content */
+        .panel-content {
+            padding: 20px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        
+        .panel-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .panel-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .panel-content::-webkit-scrollbar-thumb {
+            background: #5baa91;
+            border-radius: 10px;
+        }
+        
+        .panel-content::-webkit-scrollbar-thumb:hover {
+            background: #4a8c7a;
+        }
+        
+        /* Component Sections */
+        .component-section {
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #5baa91;
+        }
+        
+        .component-section:last-child {
             margin-bottom: 0;
         }
         
-        .stat-label {
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            font-weight: 600;
             color: #333;
-            font-size: 0.9rem;
+            font-size: 1.1rem;
         }
         
-        .stat-value {
+        .section-icon {
+            font-size: 1.2rem;
+        }
+        
+        /* Quick Actions Component */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        
+        .quick-action-btn {
+            padding: 12px 8px;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            color: #495057;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.9rem;
             font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-height: 44px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        
+        .quick-action-btn:hover {
+            background: #e9ecef;
+            border-color: #5baa91;
             color: #5baa91;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(91, 170, 145, 0.2);
+        }
+        
+        .quick-action-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .quick-action-icon {
+            font-size: 1.2rem;
+        }
+        
+        .quick-action-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        /* Search Component - Enhanced Styling */
+        .search-container {
+            position: relative;
+            margin-bottom: 8px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 16px 50px 16px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            min-height: 52px;
+            direction: rtl;
+            text-align: right;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #5baa91;
+            box-shadow: 0 0 0 3px rgba(91, 170, 145, 0.1), 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+        }
+        
+        .search-input::placeholder {
+            color: #999;
+            font-weight: 400;
+        }
+        
+        .search-input:hover {
+            border-color: #5baa91;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #5baa91;
+            font-size: 1.2rem;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus + .search-icon {
+            color: #4a8c7a;
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        /* Route Options Component */
+        .route-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .route-btn {
+            padding: 12px 8px;
+            border: 2px solid #e1e5e9;
+            background: white;
+            color: #6c757d;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .route-btn:hover {
+            border-color: #5baa91;
+            color: #5baa91;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(91, 170, 145, 0.2);
+        }
+        
+        .route-btn.active {
+            background: linear-gradient(135deg, #5baa91 0%, #4a8c7a 100%);
+            border-color: #5baa91;
+            color: white;
+            box-shadow: 0 4px 12px rgba(91, 170, 145, 0.3);
+        }
+        
+        /* Workspaces List Component - Enhanced Workspace List */
+        .workspaces-list {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 8px;
+            scroll-behavior: smooth;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-top: 8px;
+        }
+        
+        .workspaces-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .workspaces-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .workspaces-list::-webkit-scrollbar-thumb {
+            background: #5baa91;
+            border-radius: 10px;
+        }
+        
+        .workspaces-list::-webkit-scrollbar-thumb:hover {
+            background: #4a8c7a;
+        }
+        
+        .workspace-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.95rem;
+            min-height: 70px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        
+        .workspace-item:hover {
+            background: #f8f9fa;
+            border-left-color: #5baa91;
+            transform: translateX(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .workspace-item.selected {
+            background: linear-gradient(135deg, #5baa91 0%, #4a8c7a 100%);
+            color: white;
+            border-left-color: #3a7a6a;
+            box-shadow: 0 4px 12px rgba(91, 170, 145, 0.3);
+        }
+        
+        .workspace-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #333;
+            margin: 0;
+        }
+        
+        .workspace-badge {
+            background: #5baa91;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        
+        .workspace-item.selected .workspace-badge {
+            background: white;
+            color: #5baa91;
+        }
+        
+        /* Status Component */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .status-item {
+            padding: 12px 16px;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid #5baa91;
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .status-label {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .status-value {
+            font-weight: 700;
+            color: #5baa91;
+            font-size: 1rem;
+        }
+        
+        /* Nearest Workspace Component */
+        .nearest-workspace {
+            background: linear-gradient(135deg, #5baa91 0%, #4a8c7a 100%);
+            color: white;
+            padding: 16px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 16px rgba(91, 170, 145, 0.3);
+        }
+        
+        .nearest-workspace:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(91, 170, 145, 0.4);
+        }
+        
+        .nearest-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            opacity: 0.9;
+        }
+        
+        .nearest-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .nearest-distance {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 600;
         }
         
         .direction-panel {
@@ -112,15 +513,25 @@
             left: 30px;
             background: rgba(255, 255, 255, 0.95);
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
             z-index: 1000;
-            min-width: 250px;
+            min-width: 280px;
+            max-width: 350px;
             display: none;
+            transform: translateY(100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .direction-panel.show {
             display: block;
+            transform: translateY(0);
+        }
+        
+        .direction-panel.collapsed {
+            transform: translateY(100%);
         }
         
         .direction-header {
@@ -128,12 +539,17 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
         }
         
         .direction-title {
             font-weight: 700;
             color: #333;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .close-btn {
@@ -141,18 +557,21 @@
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: #333;
-            padding: 0;
-            width: 30px;
-            height: 30px;
+            color: #666;
+            padding: 8px;
+            width: 35px;
+            height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
+            transition: all 0.3s ease;
         }
         
         .close-btn:hover {
-            background: #ccc;
+            background: #f0f0f0;
+            color: #333;
+            transform: scale(1.1);
         }
         
         .direction-item {
@@ -202,33 +621,148 @@
         
         @media (max-width: 768px) {
             header h1 {
-                font-size: 2rem;
+                font-size: 1.8rem;
+            }
+            
+            .header-subtitle {
+                font-size: 0.9rem;
             }
             
             .stats-card {
-                position: relative;
-                top: auto;
-                left: auto;
-                margin: 20px;
-                width: calc(100% - 40px);
+                position: fixed;
+                top: 90px;
+                left: 10px;
+                right: 10px;
+                width: auto;
+                margin: 0;
+                padding: 16px;
+                min-width: auto;
+                z-index: 1000;
+                max-height: 65vh;
+                border-radius: 20px;
+            }
+            
+            .stats-toggle {
+                top: 100px;
+                left: 10px;
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+            }
+            
+            .stats-toggle.expanded {
+                left: calc(100vw - 55px);
             }
             
             .direction-panel {
-                position: relative;
-                bottom: auto;
-                left: auto;
-                margin: 20px;
-                width: calc(100% - 40px);
+                position: fixed;
+                bottom: 20px;
+                left: 15px;
+                right: 15px;
+                width: auto;
+                margin: 0;
+                padding: 15px;
+                min-width: auto;
+                max-width: none;
+                z-index: 1000;
+                border-radius: 20px;
+            }
+            
+            .direction-title {
+                font-size: 1.1rem;
+            }
+            
+            .close-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.3rem;
+            }
+            
+            .direction-item {
+                padding: 12px 0;
+                margin-bottom: 10px;
+            }
+            
+            .direction-label {
+                font-size: 0.95rem;
+            }
+            
+            .direction-value {
+                font-size: 1rem;
+            }
+            
+            .action-button {
+                padding: 15px 20px;
+                font-size: 1rem;
+                min-height: 48px;
+                border-radius: 12px;
             }
             
             .location-button {
                 top: auto;
-                bottom: 30px;
-                right: 30px;
+                bottom: 100px;
+                right: 20px;
+                width: 55px;
+                height: 55px;
+                font-size: 1.3rem;
+            }
+            
+            .fab {
+                bottom: 20px;
+                right: 20px;
+                width: 55px;
+                height: 55px;
+                font-size: 20px;
+            }
+            
+            .fab-menu {
+                bottom: 85px;
+                right: 20px;
+                gap: 12px;
+            }
+            
+            .fab-item {
+                width: 45px;
+                height: 45px;
+                font-size: 16px;
+            }
+            
+            .toast {
+                right: 10px;
+                left: 10px;
+                max-width: none;
+                font-size: 0.9rem;
+                padding: 12px 16px;
+            }
+            
+            .tracking-panel {
+                width: calc(100vw - 30px);
+                left: 15px;
+                right: 15px;
+                top: 15px;
             }
             
             #map {
-                height: calc(100vh - 200px);
+                height: calc(100vh - 120px);
+            }
+            
+            /* Improve touch targets */
+            .action-button {
+                padding: 15px 20px;
+                font-size: 1rem;
+                min-height: 48px;
+            }
+            
+            .track-btn {
+                padding: 15px 16px;
+                font-size: 1rem;
+                min-height: 48px;
+            }
+            
+            .close-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1.3rem;
             }
         }
         
@@ -602,41 +1136,918 @@
                 right: 20px;
             }
         }
+        
+        .nearest-workspace {
+            background: linear-gradient(135deg, #5baa91 0%, #4a8c7a 100%);
+            color: white;
+            padding: 18px 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(91, 170, 145, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .nearest-workspace:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(91, 170, 145, 0.4);
+        }
+        
+        .nearest-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+        
+        .nearest-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        
+        .nearest-distance {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+        
+        /* Enhanced Quick Stats Panel Improvements */
+        
+        /* Smooth scrolling for workspace list */
+        .workspaces-list {
+            scroll-behavior: smooth;
+        }
+        
+        /* Better focus states for accessibility */
+        .search-input:focus,
+        .route-btn:focus,
+        .workspace-item:focus {
+            outline: 2px solid #5baa91;
+            outline-offset: 2px;
+        }
+        #searchInput{
+        max-width: 15rem;
+        }
+        /* Loading state for search */
+        .search-input.loading {
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%235baa91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 20px;
+            padding-right: 50px;
+        }
+        
+        /* Empty state for workspace list */
+        .workspaces-list:empty::after {
+            content: "No workspaces found";
+            display: block;
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            font-style: italic;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin: 10px 0;
+        }
+        
+        /* Better visual hierarchy */
+        .stats-section {
+            margin-bottom: 24px;
+        }
+        
+        .stats-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        /* Enhanced workspace item states */
+        .workspace-item:active {
+            transform: scale(0.98);
+        }
+        
+        .workspace-item.loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .workspace-item.loading::after {
+            content: "";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            border: 2px solid #5baa91;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .workspaces-list {
+            max-height: 100px;
+        }
+        /* Status indicators */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-indicator.ready {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-indicator.locating {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-indicator.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-indicator.success {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        /* Quick actions */
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .quick-action-btn {
+            flex: 1;
+            padding: 12px 8px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            color: #495057;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .quick-action-btn:hover {
+            background: #e9ecef;
+            border-color: #5baa91;
+            color: #5baa91;
+            transform: translateY(-1px);
+        }
+        
+        .quick-action-btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* Responsive improvements for very small screens */
+        @media (max-width: 480px) {
+            .stats-card {
+                top: 80px;
+                left: 8px;
+                right: 8px;
+                padding: 12px;
+                max-height: 60vh;
+            }
+            
+            .stats-title {
+                font-size: 1.1rem;
+                margin-bottom: 12px;
+            }
+            
+            .search-input {
+                padding: 14px 40px 14px 14px;
+                font-size: 0.95rem;
+                min-height: 48px;
+            }
+            
+            .route-options {
+                gap: 8px;
+                margin-bottom: 12px;
+            }
+            
+            .route-btn {
+                padding: 12px 6px;
+                font-size: 0.85rem;
+                min-height: 48px;
+            }
+            
+            .workspaces-list {
+                margin-bottom: 12px;
+            }
+            
+            .workspace-item {
+                padding: 12px 14px;
+                margin-bottom: 4px;
+                min-height: 52px;
+                font-size: 0.9rem;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+                gap: 6px;
+            }
+            
+            .quick-action-btn {
+                min-height: 40px;
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .stats-card {
+                border: 2px solid #333;
+                background: white;
+            }
+            
+            .workspace-item {
+                border: 1px solid #ccc;
+            }
+            
+            .workspace-item.selected {
+                border: 2px solid #000;
+            }
+        }
+        
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            .workspace-item,
+            .route-btn,
+            .search-input,
+            .nearest-workspace {
+                transition: none;
+            }
+            
+            .workspace-item:hover {
+                transform: none;
+            }
+        }
+        
+        /* Mobile Responsive Design */
+        @media (max-width: 768px) {
+            .stats-card {
+                top: 90px;
+                left: 10px;
+                width: calc(100vw - 20px);
+                max-width: 400px;
+                max-height: 70vh;
+            }
+            
+            .stats-toggle {
+                top: 100px;
+                left: 10px;
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+            }
+            
+            .stats-toggle.expanded {
+                left: calc(100vw - 55px);
+            }
+            
+            .panel-header {
+                padding: 16px 16px 12px 16px;
+            }
+            
+            .panel-title {
+                font-size: 1.2rem;
+            }
+            
+            .panel-content {
+                padding: 16px;
+                max-height: calc(70vh - 80px);
+            }
+            
+            .component-section {
+                margin-bottom: 20px;
+                padding: 14px;
+            }
+            
+            .section-header {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+            
+            .quick-actions {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+            
+            .quick-action-btn {
+                padding: 10px 6px;
+                min-height: 40px;
+                font-size: 0.85rem;
+            }
+            
+            .quick-action-icon {
+                font-size: 1.1rem;
+            }
+            
+            .quick-action-label {
+                font-size: 0.7rem;
+            }
+            
+            .search-input {
+                padding: 14px 40px 14px 14px;
+                font-size: 0.95rem;
+                min-height: 48px;
+            }
+            
+            .search-icon {
+                right: 14px;
+                font-size: 1.1rem;
+            }
+            
+            .route-options {
+                gap: 6px;
+            }
+            
+            .route-btn {
+                padding: 10px 6px;
+                font-size: 0.85rem;
+                min-height: 44px;
+            }
+            
+            .workspaces-list {
+                max-height: 180px;
+            }
+            
+            .workspace-item {
+                padding: 10px 14px;
+                margin-bottom: 4px;
+                min-height: 52px;
+                font-size: 0.9rem;
+            }
+            
+            .workspace-name {
+                font-size: 0.9rem;
+            }
+            
+            .workspace-badge {
+                padding: 3px 8px;
+                font-size: 0.7rem;
+            }
+            
+            .status-grid {
+                gap: 8px;
+            }
+            
+            .status-item {
+                padding: 10px 14px;
+                min-height: 46px;
+            }
+            
+            .status-label {
+                font-size: 0.8rem;
+            }
+            
+            .status-value {
+                font-size: 0.95rem;
+            }
+            
+            .nearest-workspace {
+                padding: 14px 16px;
+                border-radius: 10px;
+            }
+            
+            .nearest-title {
+                font-size: 0.8rem;
+            }
+            
+            .nearest-name {
+                font-size: 1rem;
+            }
+            
+            .nearest-distance {
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* Very Small Screens */
+        @media (max-width: 480px) {
+            .stats-card {
+                top: 80px;
+                left: 8px;
+                width: calc(100vw - 16px);
+                max-height: 65vh;
+            }
+            
+            .stats-toggle {
+                top: 90px;
+                left: 8px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            .stats-toggle.expanded {
+                left: calc(100vw - 48px);
+            }
+            
+            .panel-header {
+                padding: 12px 12px 10px 12px;
+            }
+            
+            .panel-title {
+                font-size: 1.1rem;
+            }
+            
+            .panel-content {
+                padding: 12px;
+                max-height: calc(65vh - 70px);
+            }
+            
+            .component-section {
+                margin-bottom: 16px;
+                padding: 12px;
+            }
+            
+            .section-header {
+                font-size: 0.95rem;
+                margin-bottom: 10px;
+            }
+            
+            .quick-actions {
+                gap: 4px;
+            }
+            
+            .quick-action-btn {
+                padding: 8px 4px;
+                min-height: 36px;
+                font-size: 0.8rem;
+            }
+            
+            .quick-action-icon {
+                font-size: 1rem;
+            }
+            
+            .quick-action-label {
+                font-size: 0.65rem;
+            }
+            
+            .search-input {
+                padding: 12px 35px 12px 12px;
+                font-size: 0.9rem;
+                min-height: 44px;
+            }
+            
+            .search-icon {
+                right: 12px;
+                font-size: 1rem;
+            }
+            
+            .route-options {
+                gap: 4px;
+            }
+            
+            .route-btn {
+                padding: 8px 4px;
+                font-size: 0.8rem;
+                min-height: 40px;
+            }
+            
+            .workspaces-list {
+                max-height: 160px;
+            }
+            
+            .workspace-item {
+                padding: 8px 12px;
+                margin-bottom: 3px;
+                min-height: 48px;
+                font-size: 0.85rem;
+            }
+            
+            .workspace-name {
+                font-size: 0.85rem;
+            }
+            
+            .workspace-badge {
+                padding: 2px 6px;
+                font-size: 0.65rem;
+            }
+            
+            .status-grid {
+                gap: 6px;
+            }
+            
+            .status-item {
+                padding: 8px 12px;
+                min-height: 42px;
+            }
+            
+            .status-label {
+                font-size: 0.75rem;
+            }
+            
+            .status-value {
+                font-size: 0.9rem;
+            }
+            
+            .nearest-workspace {
+                padding: 12px 14px;
+            }
+            
+            .nearest-title {
+                font-size: 0.75rem;
+            }
+            
+            .nearest-name {
+                font-size: 0.95rem;
+            }
+            
+            .nearest-distance {
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Help Tooltip System */
+        .help-tooltip {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            z-index: 10000;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            max-width: 250px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .help-tooltip.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .help-tooltip::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid rgba(0, 0, 0, 0.9);
+        }
+        
+        /* Enhanced Visual Feedback */
+        .pulse-highlight {
+            animation: pulseHighlight 0.6s ease-in-out;
+        }
+        
+        @keyframes pulseHighlight {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .loading-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .loading-spinner-large {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #5baa91;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Welcome Tour */
+        .welcome-tour {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .welcome-tour.show {
+            display: flex;
+        }
+        
+        .tour-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tour-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #5baa91;
+            margin-bottom: 15px;
+        }
+        
+        .tour-text {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .tour-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .tour-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .tour-btn.primary {
+            background: #5baa91;
+            color: white;
+        }
+        
+        .tour-btn.secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+        
+        .tour-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* No Results State */
+        .no-results {
+            text-align: center;
+            padding: 30px 20px;
+            color: #666;
+            font-style: italic;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin: 10px 0;
+            border: 2px dashed #e9ecef;
+        }
+        
+        .no-results-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+        
+        /* Image loading states */
+        .workspace-image {
+            transition: opacity 0.3s ease;
+        }
+        
+        .workspace-image.loading {
+            opacity: 0.6;
+        }
+        
+        .workspace-image.loaded {
+            opacity: 1;
+        }
+        
+        .workspace-image.error {
+            opacity: 0.3;
+        }
+        
+        /* Enhanced workspace item with images */
+        .workspace-item .workspace-image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+        
+        .workspace-item .workspace-image-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+            animation: shimmer 2s infinite;
+            z-index: 1;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .workspace-item .workspace-image-container img {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* No Results State */
+        
+        /* Custom workspace marker styling */
+        .custom-div-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .custom-div-icon:hover {
+            transform: scale(1.1);
+            filter: brightness(1.1);
+        }
+        
+        .custom-div-icon img {
+            transition: all 0.3s ease;
+        }
+        
+        .custom-div-icon:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* Pulse animation for workspace markers */
+        .custom-div-icon.pulse {
+            animation: markerPulse 0.6s ease-in-out;
+        }
+        
+        @keyframes markerPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Image loading states */
     </style>
 </head>
 <body>
     <header>
-        <h1>🌍 ZenZone Workspaces</h1>
-        <div class="header-subtitle">Discover amazing workspaces in Assuit</div>
+        <h1>🌍 مساحات العمل - ZenZone</h1>
+        <div class="header-subtitle">اكتشف أحلى مساحات العمل في أسيوط</div>
     </header>
 
-    <div class="stats-card">
-        <div class="stats-title">📊 Quick Stats</div>
-        <div class="stat-item">
-            <span class="stat-label">Workspaces</span>
-            <span class="stat-value" id="workspaceCount">4</span>
+    <!-- Toggle Button for Stats Panel -->
+    <button class="stats-toggle" id="statsToggle" onclick="toggleStatsPanel()" title="شوف/خبي الإحصائيات">
+        📊
+    </button>
+
+    <!-- Collapsible Quick Stats Panel -->
+    <div class="stats-card" id="statsCard">
+        <div class="panel-header">
+            <h3 class="panel-title">📊 الإحصائيات السريعة</h3>
+            <button class="panel-close" onclick="toggleStatsPanel()" title="قفل اللوحة">×</button>
         </div>
-        <div class="stat-item">
-            <span class="stat-label">Nearest</span>
-            <span class="stat-value" id="nearestDistance">-</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-label">Status</span>
-            <span class="stat-value" id="locationStatus">📍 Ready</span>
-        </div>
-        <div class="location-item">
-            <span class="location-label">Nearest Distance:</span>
-            <span class="location-value" id="nearestDistance">-</span>
-        </div>
-        <div class="location-item">
-            <span class="location-label">Accuracy:</span>
-            <span class="location-value" id="locationAccuracy">-</span>
+        
+        <div class="panel-content">
+            <!-- Search Component - First -->
+            <div class="component-section">
+                <div class="section-header">
+                    <span class="section-icon">🔍</span>
+                    دور على مساحة عمل
+                </div>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="اكتب اسم مساحة العمل..." class="search-input">
+                    <span class="search-icon">🔍</span>
+                </div>
+            </div>
+            
+            <!-- Workspaces List Component - Results directly under search -->
+            <div class="component-section">
+                <div class="section-header">
+                    <span class="section-icon">🏢</span>
+                    مساحات العمل المتاحة
+                </div>
+                <div class="workspaces-list" id="workspacesList">
+                    <!-- Workspace names will be populated here -->
+                </div>
+            </div>
+            
+            <!-- Route Options Component -->
+            <div class="component-section">
+                <div class="section-header">
+                    <span class="section-icon">🧭</span>
+                    ازاي تروح
+                </div>
+                <div class="route-options">
+                    <button class="route-btn active" onclick="toggleRouteType('driving')">🚗 بالعربية</button>
+                    <button class="route-btn" onclick="toggleRouteType('walking')">🚶 ماشي</button>
+                    <button class="route-btn" onclick="toggleRouteType('cycling')">🚴 بالدراجة</button>
+                    <button class="route-btn" onclick="toggleRouteType('motorcycle')">🏍️ بالموتوسيكل</button>
+                </div>
+            </div>
+            
+            <!-- Nearest Workspace Component -->
+            <div class="nearest-workspace" id="nearestWorkspace" style="display: none;">
+                <div class="nearest-title">📍 أقرب مساحة عمل</div>
+                <div class="nearest-name" id="nearestName">-</div>
+                <div class="nearest-distance" id="nearestDistanceDisplay">-</div>
+            </div>
+            
+            <!-- Quick Actions Component -->
+            <div class="component-section">
+                <div class="section-header">
+                    <span class="section-icon">⚡</span>
+                    إجراءات سريعة
+                </div>
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="getUserLocation()" title="اعرف مكاني">
+                        <span class="quick-action-icon">📍</span>
+                        <span class="quick-action-label">مكاني</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="fitToBounds()" title="شوف الكل">
+                        <span class="quick-action-icon">🔍</span>
+                        <span class="quick-action-label">شوف الكل</span>
+                    </button>
+                    <button class="quick-action-btn" onclick="clearRoute()" title="امسح المسار">
+                        <span class="quick-action-icon">🗑️</span>
+                        <span class="quick-action-label">امسح</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Status Component -->
+            <div class="component-section">
+                <div class="section-header">
+                    <span class="section-icon">📊</span>
+                    حالة الموقع
+                </div>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="status-label">الحالة</div>
+                        <div class="status-value" id="locationStatus">📍 جاهز</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">الدقة</div>
+                        <div class="status-value" id="locationAccuracy">-</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="direction-panel" id="directionPanel">
         <div class="direction-header">
-            <div class="direction-title">🧭 Directions</div>
+            <div class="direction-title">🧭 الاتجاهات</div>
             <button class="close-btn" onclick="closeDirectionPanel()">×</button>
         </div>
         <div class="direction-info" id="directionInfo">
@@ -644,7 +2055,7 @@
         </div>
     </div>
 
-    <button class="location-button" id="getLocation" title="Get My Location">
+    <button class="location-button" id="getLocation" title="الحصول على موقعي">
         📍
     </button>
 
@@ -663,19 +2074,19 @@
     
     <!-- FAB Menu -->
     <div class="fab-menu" id="fabMenu">
-        <button class="fab-item" onclick="getUserLocation()" title="Get My Location">
+        <button class="fab-item" onclick="getUserLocation()" title="الحصول على موقعي">
             📍
         </button>
-        <button class="fab-item" onclick="toggleTrackingPanel()" title="Live Navigation">
+        <button class="fab-item" onclick="toggleTrackingPanel()" title="الملاحة المباشرة">
             🧭
         </button>
-        <button class="fab-item" onclick="clearRoute()" title="Clear Route">
+        <button class="fab-item" onclick="clearRoute()" title="مسح المسار">
             🗑️
         </button>
-        <button class="fab-item" onclick="fitToBounds()" title="Fit to View">
+        <button class="fab-item" onclick="fitToBounds()" title="ملء الشاشة">
             🔍
         </button>
-        <button class="fab-item" onclick="toggleFullscreen()" title="Fullscreen">
+        <button class="fab-item" onclick="toggleFullscreen()" title="ملء الشاشة">
             ⛶
         </button>
     </div>
@@ -683,54 +2094,77 @@
     <!-- Real-time Tracking Panel -->
     <div class="panel tracking-panel" id="trackingPanel">
         <div class="panel-header">
-            <h3>🧭 Live Navigation</h3>
+            <h3>🧭 الملاحة المباشرة</h3>
             <button class="close-btn" onclick="stopTracking()">×</button>
         </div>
         <div class="tracking-content">
             <div class="tracking-status" id="trackingStatus">
                 <div class="status-indicator">
                     <span class="status-dot" id="statusDot"></span>
-                    <span id="statusText">Ready to track</span>
+                    <span id="statusText">جاهز للملاحة</span>
                 </div>
             </div>
             
             <div class="tracking-info">
                 <div class="info-item">
-                    <span class="info-label">Distance Remaining:</span>
+                    <span class="info-label">المسافة المتبقية:</span>
                     <span class="info-value" id="remainingDistance">-</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">ETA:</span>
+                    <span class="info-label">الوقت المتوقع:</span>
                     <span class="info-value" id="eta">-</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Speed:</span>
+                    <span class="info-label">السرعة:</span>
                     <span class="info-value" id="currentSpeed">-</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Accuracy:</span>
+                    <span class="info-label">الدقة:</span>
                     <span class="info-value" id="trackingAccuracy">-</span>
                 </div>
             </div>
             
             <div class="navigation-instructions" id="navigationInstructions">
-                <h4>Next Turn</h4>
+                <h4>المنعطف التالي</h4>
                 <div class="instruction-card" id="currentInstruction">
                     <div class="instruction-icon">🚶</div>
-                    <div class="instruction-text">Start navigation to begin</div>
+                    <div class="instruction-text">ابدأ الملاحة للبدء</div>
                 </div>
             </div>
             
             <div class="tracking-controls">
                 <button class="track-btn" id="startTrackingBtn" onclick="startRealTimeTracking()">
-                    🚀 Start Navigation
+                    🚀 بدء الملاحة
                 </button>
                 <button class="track-btn secondary" onclick="pauseTracking()" id="pauseBtn" style="display: none;">
-                    ⏸️ Pause
+                    ⏸️ إيقاف مؤقت
                 </button>
                 <button class="track-btn secondary" onclick="resumeTracking()" id="resumeBtn" style="display: none;">
-                    ▶️ Resume
+                    ▶️ استئناف
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Tooltip -->
+    <div class="help-tooltip" id="helpTooltip"></div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner-large"></div>
+    </div>
+    
+    <!-- Welcome Tour -->
+    <div class="welcome-tour" id="welcomeTour">
+        <div class="tour-content">
+            <div class="tour-title">🎉 مرحباً بك في ZenZone!</div>
+            <div class="tour-text">
+                اكتشف مساحات العمل المذهلة في أسيوط مع خريطتنا التفاعلية. 
+                احصل على الاتجاهات، ابحث عن أقرب مساحة عمل، وانتقل في الوقت الفعلي.
+            </div>
+            <div class="tour-buttons">
+                <button class="tour-btn secondary" onclick="skipTour()">تخطي</button>
+                <button class="tour-btn primary" onclick="startTour()">ابدأ</button>
             </div>
         </div>
     </div>
@@ -747,9 +2181,9 @@
         console.log('Map created');
         
         // Add tile layer
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '',
-            subdomains: 'abcd',
+            subdomains: 'abc',
             maxZoom: 19
         }).addTo(map);
         console.log('Tile layer added');
@@ -758,35 +2192,43 @@
         const workspaces = [
             {
                 id: 1,
-                name: "ZenZone Downtown",
+                name: "ZenZone وسط البلد",
                 lat: 27.1828,
                 lng: 31.1828,
-                description: "Modern workspace in the heart of Assuit with high-speed internet and meeting rooms.",
-                badge: "Premium"
+                description: "مساحة عمل جامدة في وسط أسيوط مع إنترنت سريع وغرف اجتماعات.",
+                badge: "مميز",
+                dir: "downtown",
+                img: "main.jpg"
             },
             {
                 id: 2,
-                name: "ZenZone University",
+                name: "ZenZone الجامعة",
                 lat: 27.1750,
                 lng: 31.1900,
-                description: "Perfect for students and academics near Assuit University campus.",
-                badge: "Student"
+                description: "مثالية للطلبة والأساتذة قريبة من جامعة أسيوط.",
+                badge: "طلابي",
+                dir: "university",
+                img: "campus.jpg"
             },
             {
                 id: 3,
-                name: "ZenZone Mall",
+                name: "ZenZone المول",
                 lat: 27.1950,
                 lng: 31.1700,
-                description: "Convenient location near shopping centers with 24/7 access.",
-                badge: "24/7"
+                description: "موقع حلو قريب من المولات مع دخول 24 ساعة.",
+                badge: "24/7",
+                dir: "alnagah",
+                img: "Alnagah.jpg"
             },
             {
                 id: 4,
-                name: "ZenZone Industrial",
+                name: "ZenZone المنطقة الصناعية",
                 lat: 27.1600,
                 lng: 31.2000,
-                description: "Industrial area workspace with parking and security.",
-                badge: "Secure"
+                description: "مساحة عمل في المنطقة الصناعية مع موقف سيارات وأمان.",
+                badge: "آمن",
+                dir: "noon",
+                img: "noon.jpg"
             }
         ];
         
@@ -803,39 +2245,92 @@
         let currentRouteIndex = 0;
         let routeInstructions = [];
         
-        // Custom workspace icon
-        const workspaceIcon = L.divIcon({
-            html: `<div style="background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(91, 170, 145, 0.4); border: 3px solid white;"><span style="color: white; font-size: 18px;">🏢</span></div>`,
-            className: 'custom-div-icon',
-            iconSize: [40, 40],
-            iconAnchor: [20, 20],
-            popupAnchor: [0, -20]
-        });
+        // Custom workspace icon with actual image
+        function createWorkspaceIcon(workspace) {
+            const imageUrl = getWorkspaceImageUrl(workspace);
+            const fallbackIcon = '🏢';
+            
+            if (imageUrl) {
+                return L.divIcon({
+                    html: `<div style="width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(91, 170, 145, 0.5); border: 4px solid white; position: relative; background: white; overflow: hidden;">
+                            <img src="${imageUrl}" alt="${workspace.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; align-items: center; justify-content: center; width: 100%; height: 100%; background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%); color: white; font-size: 20px; border-radius: 50%;">${fallbackIcon}</div>
+                            <div style="position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); background: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; color: #5baa91; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">WORK</div>
+                           </div>`,
+                    className: 'custom-div-icon',
+                    iconSize: [50, 58],
+                    iconAnchor: [25, 29],
+                    popupAnchor: [0, -29]
+                });
+            } else {
+                // Fallback to original design if no image
+                return L.divIcon({
+                    html: `<div style="background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(91, 170, 145, 0.5); border: 4px solid white; position: relative;">
+                            <span style="color: white; font-size: 20px;">${fallbackIcon}</span>
+                            <div style="position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); background: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; color: #5baa91; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">WORK</div>
+                           </div>`,
+                    className: 'custom-div-icon',
+                    iconSize: [45, 53],
+                    iconAnchor: [22, 26],
+                    popupAnchor: [0, -26]
+                });
+            }
+        }
         
         // User location icon
         const userLocationIcon = L.divIcon({
-            html: `<div style="background: linear-gradient(135deg, rgba(102, 161, 133, 1) 0%, #4a9980 100%); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(102, 161, 133, 0.4); border: 3px solid white;"><span style="color: white; font-size: 16px;">📍</span></div>`,
+            html: `<div style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(220, 53, 69, 0.5); border: 4px solid white; position: relative;">
+                    <span style="color: white; font-size: 18px;">📍</span>
+                    <div style="position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; color: #dc3545; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">YOU</div>
+                   </div>`,
             className: 'user-location-icon',
-            iconSize: [30, 30],
-            iconAnchor: [15, 15]
+            iconSize: [35, 43],
+            iconAnchor: [17, 21]
         });
+        
+        // Get workspace image URL
+        function getWorkspaceImageUrl(workspace) {
+            if (workspace.dir && workspace.img) {
+                return `https://zenzone.flexispace.space/workspaces/${workspace.dir}/${workspace.img}`;
+            }
+            return null;
+        }
         
         // Add workspaces to map
         workspaces.forEach(ws => {
-            const marker = L.marker([ws.lat, ws.lng], { icon: workspaceIcon }).addTo(map);
+            const marker = L.marker([ws.lat, ws.lng], { icon: createWorkspaceIcon(ws) }).addTo(map);
             ws.marker = marker;
             
             // Add enhanced click handler
             addWorkspaceClickHandler(ws, marker);
             
             marker.bindPopup(`
-                <div style="font-family: 'Cairo', sans-serif; min-width: 250px;">
-                    <div style="background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%); margin: -15px -15px 10px -15px; padding: 15px; color: white; border-radius: 8px 8px 0 0;">
-                        <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 5px;">${ws.name}</div>
-                        <div style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; display: inline-block;">${ws.badge}</div>
+                <div style="font-family: 'Cairo', sans-serif; min-width: 280px; max-width: 320px;">
+                    <div style="background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%); margin: -15px -15px 15px -15px; padding: 20px; color: white; border-radius: 12px 12px 0 0;">
+                        <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 8px;">${ws.name}</div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 15px; font-size: 0.85rem; display: inline-block; font-weight: 600;">${ws.badge}</div>
                     </div>
-                    <div style="margin-bottom: 10px; line-height: 1.4;">${ws.description}</div>
-                    <button onclick="showDirectionPanelById(${ws.id})" style="width: 100%; padding: 8px 16px; background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: 600;">🧭 Get Directions</button>
+                    ${getWorkspaceImageUrl(ws) ? `
+                        <div style="margin-bottom: 15px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            <img src="${getWorkspaceImageUrl(ws)}" alt="${ws.name}" style="width: 100%; height: 150px; object-fit: cover; display: block;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div style="display: none; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 60px 20px; text-align: center; color: #666; font-size: 0.9rem;">
+                                <div style="font-size: 2rem; margin-bottom: 10px;">🏢</div>
+                                <div>صورة مساحة العمل</div>
+                            </div>
+                        </div>
+                    ` : `
+                        <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 40px 20px; text-align: center; color: #666; font-size: 0.9rem; border-radius: 8px; margin-bottom: 15px;">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">🏢</div>
+                            <div>مساحة العمل</div>
+                        </div>
+                    `}
+                    <div style="margin-bottom: 15px; line-height: 1.5; color: #333; font-size: 0.95rem;">${ws.description}</div>
+                    <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #5baa91;">
+                        <div style="font-weight: 600; color: #5baa91; margin-bottom: 5px; font-size: 0.9rem;">📍 Address</div>
+                        <div style="color: #666; font-size: 0.9rem;">Assuit, Egypt</div>
+                        <div style="color: #999; font-size: 0.8rem; margin-top: 3px;">Coordinates: ${ws.lat.toFixed(4)}, ${ws.lng.toFixed(4)}</div>
+                    </div>
+                    <button onclick="showDirectionPanelById(${ws.id})" style="width: 100%; padding: 12px 16px; background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 1rem; transition: all 0.3s ease;">🧭 Get Directions</button>
                 </div>
             `);
         });
@@ -897,8 +2392,8 @@
             const bearing = getBearing(userLocation[0], userLocation[1], workspace.lat, workspace.lng);
             const direction = getDirectionName(bearing);
             
-            // Create street-level route
-            createStreetRoute(userLocation, [workspace.lat, workspace.lng]);
+            // Create route with current route type
+            createRoute(userLocation, [workspace.lat, workspace.lng], currentRouteType);
             
             const directionInfo = document.getElementById('directionInfo');
             directionInfo.innerHTML = `
@@ -923,11 +2418,32 @@
             document.getElementById('directionPanel').classList.add('show');
             
             // Show tracking panel option
-            showToast(`Street route to ${workspace.name} ready! Click 🧭 for live navigation`, 'success');
+            showToast(`${currentRouteType.charAt(0).toUpperCase() + currentRouteType.slice(1)} route to ${workspace.name} ready! Click 🧭 for live navigation`, 'success');
+        }
+        
+        // Helper functions for route styling
+        function getRouteColor(routeType) {
+            switch(routeType) {
+                case 'driving': return '#5baa91';
+                case 'walking': return '#ff6b35';
+                case 'cycling': return '#4ecdc4';
+                case 'motorcycle': return '#45b7d1';
+                default: return '#5baa91';
+            }
+        }
+        
+        function getRoutePattern(routeType) {
+            switch(routeType) {
+                case 'driving': return '20, 10';
+                case 'walking': return '5, 5';
+                case 'cycling': return '15, 8';
+                case 'motorcycle': return '25, 12';
+                default: return '20, 10';
+            }
         }
         
         // Create route function
-        function createRoute(start, end) {
+        function createRoute(start, end, routeType = 'driving') {
             // Clear previous route
             if (routePolyline) {
                 map.removeLayer(routePolyline);
@@ -937,12 +2453,12 @@
             
             // Show loading state
             const directionInfo = document.getElementById('directionInfo');
-            directionInfo.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading-spinner"></div><br>Calculating street route...</div>';
+            directionInfo.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading-spinner"></div><br>Calculating route...</div>';
             showProgress(30);
-            showToast('Calculating street route...', 'info');
+            showToast(`Calculating ${routeType} route...`, 'info');
             
             // Use OSRM (Open Source Routing Machine) for real street routing
-            const apiUrl = `https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson&steps=true`;
+            const apiUrl = `https://router.project-osrm.org/route/v1/${routeType}/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson&steps=true`;
             
             fetch(apiUrl)
             .then(response => {
@@ -960,52 +2476,39 @@
                     
                     // Create polyline for the route
                     routePolyline = L.polyline(coordinates, {
-                        color: '#5baa91',
-                        weight: 8,
-                        opacity: 0.9,
-                        dashArray: '15, 8',
+                        color: getRouteColor(routeType),
+                        weight: 6,
+                        opacity: 0.8,
+                        dashArray: getRoutePattern(routeType),
                         lineCap: 'round',
                         lineJoin: 'round'
                     }).addTo(map);
-                    
-                    // Add direction arrows along the route
-                    for (let i = 0; i < coordinates.length - 1; i += Math.max(1, Math.floor(coordinates.length / 10))) {
-                        const point = coordinates[i];
-                        const nextPoint = coordinates[i + 1];
-                        const bearing = getBearing(point[0], point[1], nextPoint[0], nextPoint[1]);
-                        
-                        const arrowIcon = L.divIcon({
-                            html: `<div style="transform: rotate(${bearing}deg); color: #5baa91; font-size: 20px; background: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">➤</div>`,
-                            className: 'route-arrow',
-                            iconSize: [24, 24],
-                            iconAnchor: [12, 12]
-                        });
-                        
-                        const arrowMarker = L.marker(point, { icon: arrowIcon }).addTo(map);
-                        routeMarkers.push(arrowMarker);
-                    }
                     
                     // Fit map to show entire route
                     const bounds = L.latLngBounds(coordinates);
                     map.fitBounds(bounds, { padding: [20, 20] });
                     
-                    // Update direction info with real route data
+                    // Calculate realistic travel time based on route type
                     const distance = route.distance / 1000; // Convert to km
-                    const duration = route.duration / 60; // Convert to minutes
+                    const calculatedDuration = calculateTravelTime(distance, routeType);
                     
                     const directionInfo = document.getElementById('directionInfo');
                     directionInfo.innerHTML = `
                         <div class="direction-item">
-                            <span class="direction-label">Street Route Distance:</span>
+                            <span class="direction-label">${routeType.charAt(0).toUpperCase() + routeType.slice(1)} Route:</span>
                             <span class="direction-value">${formatDistance(distance)}</span>
                         </div>
                         <div class="direction-item">
                             <span class="direction-label">Estimated Time:</span>
-                            <span class="direction-value">${Math.round(duration)} min</span>
+                            <span class="direction-value">${formatTravelTime(calculatedDuration)}</span>
+                        </div>
+                        <div class="direction-item">
+                            <span class="direction-label">Average Speed:</span>
+                            <span class="direction-value">${getAverageSpeed(routeType)}</span>
                         </div>
                         <div class="direction-item">
                             <span class="direction-label">Route Type:</span>
-                            <span class="direction-value">Street Navigation</span>
+                            <span class="direction-value">${routeType.charAt(0).toUpperCase() + routeType.slice(1)}</span>
                         </div>
                         <div class="direction-item">
                             <span class="direction-label">Coordinates:</span>
@@ -1015,7 +2518,7 @@
                     
                     showProgress(100);
                     setTimeout(hideProgress, 500);
-                    showToast('Street route calculated successfully!', 'success');
+                    showToast(`${routeType.charAt(0).toUpperCase() + routeType.slice(1)} route calculated!`, 'success');
                 } else {
                     throw new Error('No route found');
                 }
@@ -1028,10 +2531,10 @@
                 // Fallback to simple straight line route
                 const waypoints = [start, end];
                 routePolyline = L.polyline(waypoints, {
-                    color: '#5baa91',
-                    weight: 8,
-                    opacity: 0.9,
-                    dashArray: '15, 8',
+                    color: getRouteColor(routeType),
+                    weight: 6,
+                    opacity: 0.8,
+                    dashArray: getRoutePattern(routeType),
                     lineCap: 'round',
                     lineJoin: 'round'
                 }).addTo(map);
@@ -1039,10 +2542,11 @@
                 const bounds = L.latLngBounds(waypoints);
                 map.fitBounds(bounds, { padding: [20, 20] });
                 
-                // Show fallback info
+                // Show fallback info with calculated travel time
                 const distance = calculateDistance(start[0], start[1], end[0], end[1]);
-                const bearing = getBearing(start[0], start[1], end[0], end[1]);
-                const direction = getDirectionName(bearing);
+                const calculatedDuration = calculateTravelTime(distance, routeType);
+                const fallbackBearing = getBearing(start[0], start[1], end[0], end[1]);
+                const direction = getDirectionName(fallbackBearing);
                 
                 const directionInfo = document.getElementById('directionInfo');
                 directionInfo.innerHTML = `
@@ -1051,12 +2555,20 @@
                         <span class="direction-value">${formatDistance(distance)}</span>
                     </div>
                     <div class="direction-item">
+                        <span class="direction-label">Estimated Time:</span>
+                        <span class="direction-value">${formatTravelTime(calculatedDuration)}</span>
+                    </div>
+                    <div class="direction-item">
+                        <span class="direction-label">Average Speed:</span>
+                        <span class="direction-value">${getAverageSpeed(routeType)}</span>
+                    </div>
+                    <div class="direction-item">
                         <span class="direction-label">Direction:</span>
                         <span class="direction-value">${direction}</span>
                     </div>
                     <div class="direction-item">
                         <span class="direction-label">Bearing:</span>
-                        <span class="direction-value">${Math.round(bearing)}°</span>
+                        <span class="direction-value">${Math.round(fallbackBearing)}°</span>
                     </div>
                     <div class="direction-item">
                         <span class="direction-label">Coordinates:</span>
@@ -1064,6 +2576,51 @@
                     </div>
                 `;
             });
+        }
+        
+        // Calculate travel time based on route type and distance
+        function calculateTravelTime(distanceKm, routeType) {
+            const speeds = {
+                driving: 30,      // 30 km/h average in city traffic
+                walking: 5,       // 5 km/h walking speed
+                cycling: 15,      // 15 km/h cycling speed
+                motorcycle: 25    // 25 km/h motorcycle in city traffic
+            };
+            
+            const speed = speeds[routeType] || speeds.driving;
+            const timeHours = distanceKm / speed;
+            const timeMinutes = timeHours * 60;
+            
+            return timeMinutes;
+        }
+        
+        // Format travel time for display
+        function formatTravelTime(minutes) {
+            if (minutes < 1) {
+                return `${Math.round(minutes * 60)} sec`;
+            } else if (minutes < 60) {
+                return `${Math.round(minutes)} min`;
+            } else {
+                const hours = Math.floor(minutes / 60);
+                const remainingMinutes = Math.round(minutes % 60);
+                if (remainingMinutes === 0) {
+                    return `${hours} hr`;
+                } else {
+                    return `${hours} hr ${remainingMinutes} min`;
+                }
+            }
+        }
+        
+        // Get average speed for route type
+        function getAverageSpeed(routeType) {
+            const speeds = {
+                driving: '30 km/h',
+                walking: '5 km/h',
+                cycling: '15 km/h',
+                motorcycle: '25 km/h'
+            };
+            
+            return speeds[routeType] || speeds.driving;
         }
         
         // Show direction panel by ID function
@@ -1174,7 +2731,9 @@
                     nearestDistance = distance;
                 }
             });
-            document.getElementById('nearestDistance').textContent = formatDistance(nearestDistance);
+            
+            // Update nearest workspace display
+            updateNearestWorkspace();
             
             // Update accuracy display
             const accuracyElement = document.getElementById('locationAccuracy');
@@ -1231,12 +2790,347 @@
         document.getElementById('getLocation').addEventListener('click', getUserLocation);
         
         // Initialize stats
-        document.getElementById('workspaceCount').textContent = workspaces.length;
+        // document.getElementById('workspaceCount').textContent = workspaces.length;
+        
+        // Populate workspace list
+        function populateWorkspaceList() {
+            const workspacesList = document.getElementById('workspacesList');
+            if (!workspacesList) {
+                console.error('Workspaces list container not found!');
+                return;
+            }
+            
+            console.log('Populating workspace list with', workspaces.length, 'workspaces');
+            
+            workspacesList.innerHTML = '';
+            
+            workspaces.forEach((ws, index) => {
+                const workspaceItem = document.createElement('div');
+                workspaceItem.className = 'workspace-item';
+                workspaceItem.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <div style="width: 50px; height: 50px; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                            ${getWorkspaceImageUrl(ws) ? `
+                                <img src="${getWorkspaceImageUrl(ws)}" alt="${ws.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div style="display: none; align-items: center; justify-content: center; width: 100%; height: 100%; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); color: #666; font-size: 1.2rem;">🏢</div>
+                            ` : `
+                                <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); color: #666; font-size: 1.2rem;">🏢</div>
+                            `}
+                        </div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="workspace-name" style="margin-bottom: 4px;">${ws.name}</div>
+                            <div style="font-size: 0.8rem; color: #666; line-height: 1.3;">${ws.description.substring(0, 60)}${ws.description.length > 60 ? '...' : ''}</div>
+                        </div>
+                    </div>
+                    <span class="workspace-badge">${ws.badge}</span>
+                `;
+                
+                workspaceItem.addEventListener('click', () => {
+                    console.log('Workspace clicked:', ws.name);
+                    
+                    // Add haptic feedback
+                    hapticFeedback();
+                    
+                    // Remove previous selection
+                    document.querySelectorAll('.workspace-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    
+                    // Add selection to current item
+                    workspaceItem.classList.add('selected');
+                    
+                    // Use enhanced click function
+                    enhancedWorkspaceClick(ws);
+                    
+                    // Show success feedback
+                    showSuccessFeedback(workspaceItem);
+                });
+                
+                // Add hover tooltip
+                workspaceItem.addEventListener('mouseenter', () => {
+                    if (window.innerWidth > 768) {
+                        showTooltip(workspaceItem, `انقر لعرض ${ws.name}`, 2000);
+                    }
+                });
+                
+                workspacesList.appendChild(workspaceItem);
+            });
+            
+            console.log('Workspace list populated successfully');
+        }
+        
+        // Search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            if (!searchInput) {
+                console.error('Search input not found!');
+                return;
+            }
+            
+            console.log('Setting up search functionality...');
+            
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                const workspaceItems = document.querySelectorAll('.workspace-item');
+                
+                console.log('Search term:', searchTerm, 'Items found:', workspaceItems.length);
+                
+                if (searchTerm === '') {
+                    // Show all items if search is empty
+                    workspaceItems.forEach(item => {
+                        item.style.display = 'flex';
+                        item.style.opacity = '1';
+                    });
+                    
+                    // Update section header
+                    updateWorkspaceSectionHeader(workspaces.length, false);
+                    return;
+                }
+                
+                let hasResults = false;
+                let resultCount = 0;
+                
+                workspaceItems.forEach((item, index) => {
+                    const workspaceName = workspaces[index].name.toLowerCase();
+                    const workspaceDesc = workspaces[index].description.toLowerCase();
+                    const workspaceBadge = workspaces[index].badge.toLowerCase();
+                    
+                    if (workspaceName.includes(searchTerm) || 
+                        workspaceDesc.includes(searchTerm) || 
+                        workspaceBadge.includes(searchTerm)) {
+                        item.style.display = 'flex';
+                        item.style.opacity = '1';
+                        hasResults = true;
+                        resultCount++;
+                        
+                        // Highlight matching text
+                        const nameElement = item.querySelector('.workspace-name');
+                        if (nameElement && workspaceName.includes(searchTerm)) {
+                            nameElement.innerHTML = workspaceName.replace(
+                                new RegExp(searchTerm, 'gi'), 
+                                match => `<mark style="background: #ffeb3b; padding: 1px 2px; border-radius: 2px; color: #333;">${match}</mark>`
+                            );
+                        }
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                
+                // Update section header with results count
+                updateWorkspaceSectionHeader(resultCount, true);
+                
+                // Show no results message
+                if (!hasResults && searchTerm !== '') {
+                    showNoResultsMessage(searchTerm);
+                } else {
+                    removeNoResultsMessage();
+                }
+            });
+            
+            // Clear search on escape
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    searchInput.value = '';
+                    searchInput.dispatchEvent(new Event('input'));
+                    searchInput.blur();
+                }
+            });
+            
+            // Add search icon click functionality
+            const searchIcon = document.querySelector('.search-icon');
+            if (searchIcon) {
+                searchIcon.addEventListener('click', () => {
+                    searchInput.focus();
+                });
+            }
+            
+            console.log('Search functionality setup complete');
+        }
+        
+        // Update workspace section header with results count
+        function updateWorkspaceSectionHeader(count, isSearching) {
+            const sectionHeader = document.querySelector('.component-section:nth-child(2) .section-header');
+            if (sectionHeader) {
+                if (isSearching) {
+                    sectionHeader.innerHTML = `
+                        <span class="section-icon">🏢</span>
+                        مساحات العمل المتاحة
+                        <span style="background: #5baa91; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; margin-right: 8px;">
+                            ${count} نتيجة
+                        </span>
+                    `;
+                } else {
+                    sectionHeader.innerHTML = `
+                        <span class="section-icon">🏢</span>
+                        مساحات العمل المتاحة
+                    `;
+                }
+            }
+        }
+        
+        // Show no results message
+        function showNoResultsMessage(searchTerm) {
+            removeNoResultsMessage(); // Remove any existing message
+            
+            const workspacesList = document.getElementById('workspacesList');
+            const noResults = document.createElement('div');
+            noResults.className = 'no-results';
+            noResults.innerHTML = `
+                <div class="no-results-icon">🔍</div>
+                <div style="font-weight: 600; margin-bottom: 8px;">مش لاقي حاجة</div>
+                <div>مفيش مساحات عمل تطابق "${searchTerm}"</div>
+                <div style="font-size: 0.9rem; margin-top: 8px; opacity: 0.7;">جرب كلمة تانية</div>
+            `;
+            workspacesList.appendChild(noResults);
+        }
+        
+        // Remove no results message
+        function removeNoResultsMessage() {
+            const existingNoResults = document.querySelector('.no-results');
+            if (existingNoResults) {
+                existingNoResults.remove();
+            }
+        }
+        
+        // Find and display nearest workspace
+        function updateNearestWorkspace() {
+            if (!userLocation) return;
+            
+            let nearestWorkspace = null;
+            let nearestDistance = Infinity;
+            
+            workspaces.forEach(ws => {
+                const distance = calculateDistance(userLocation[0], userLocation[1], ws.lat, ws.lng);
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearestWorkspace = ws;
+                }
+            });
+            
+            if (nearestWorkspace) {
+                const nearestElement = document.getElementById('nearestWorkspace');
+                nearestElement.style.display = 'block';
+                
+                // Update content with image
+                nearestElement.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 60px; height: 60px; border-radius: 10px; overflow: hidden; flex-shrink: 0; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center;">
+                            ${getWorkspaceImageUrl(nearestWorkspace) ? `
+                                <img src="${getWorkspaceImageUrl(nearestWorkspace)}" alt="${nearestWorkspace.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div style="display: none; align-items: center; justify-content: center; width: 100%; height: 100%; color: white; font-size: 1.5rem;">🏢</div>
+                            ` : `
+                                <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: white; font-size: 1.5rem;">🏢</div>
+                            `}
+                        </div>
+                        <div style="flex: 1;">
+                            <div class="nearest-title">📍 أقرب مساحة عمل</div>
+                            <div class="nearest-name">${nearestWorkspace.name}</div>
+                            <div class="nearest-distance">${formatDistance(nearestDistance)}</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add click to navigate
+                nearestElement.style.cursor = 'pointer';
+                nearestElement.onclick = () => {
+                    // Remove previous selection
+                    document.querySelectorAll('.workspace-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    
+                    // Center map on nearest workspace
+                    map.setView([nearestWorkspace.lat, nearestWorkspace.lng], 15);
+                    
+                    // Show workspace popup
+                    nearestWorkspace.marker.openPopup();
+                    
+                    // If user location is available, show route
+                    if (userLocation) {
+                        showDirectionPanel(nearestWorkspace);
+                    }
+                };
+            }
+        }
+        
+        // Initialize workspace list and search
+        populateWorkspaceList();
+        setupSearch();
+        
+        // Set default route type
+        document.querySelector('.route-btn').classList.add('active');
         
         // Make functions globally available
         window.showDirectionPanel = showDirectionPanel;
         window.showDirectionPanelById = showDirectionPanelById;
         window.closeDirectionPanel = closeDirectionPanel;
+        window.toggleRouteType = toggleRouteType;
+        window.getUserLocation = getUserLocation;
+        window.toggleFabMenu = toggleFabMenu;
+        window.clearRoute = clearRoute;
+        window.fitToBounds = fitToBounds;
+        window.toggleFullscreen = toggleFullscreen;
+        window.toggleTrackingPanel = toggleTrackingPanel;
+        window.startRealTimeTracking = startRealTimeTracking;
+        window.pauseTracking = pauseTracking;
+        window.resumeTracking = resumeTracking;
+        window.stopTracking = stopTracking;
+        window.toggleStatsPanel = toggleStatsPanel;
+        
+        // Toggle Stats Panel Function
+        function toggleStatsPanel() {
+            const statsCard = document.getElementById('statsCard');
+            const statsToggle = document.getElementById('statsToggle');
+            
+            if (statsCard.classList.contains('collapsed')) {
+                // Expand panel
+                statsCard.classList.remove('collapsed');
+                statsCard.classList.add('expanded');
+                statsToggle.classList.remove('collapsed');
+                statsToggle.classList.add('expanded');
+                statsToggle.innerHTML = '📊';
+                statsToggle.title = 'Hide Quick Stats';
+            } else {
+                // Collapse panel
+                statsCard.classList.remove('expanded');
+                statsCard.classList.add('collapsed');
+                statsToggle.classList.remove('expanded');
+                statsToggle.classList.add('collapsed');
+                statsToggle.innerHTML = '📊';
+                statsToggle.title = 'Show Quick Stats';
+            }
+        }
+        
+        // Initialize stats panel state
+        document.addEventListener('DOMContentLoaded', function() {
+            const statsCard = document.getElementById('statsCard');
+            const statsToggle = document.getElementById('statsToggle');
+            
+            // Start with panel expanded on desktop, collapsed on mobile
+            if (window.innerWidth <= 768) {
+                statsCard.classList.add('collapsed');
+                statsToggle.classList.add('collapsed');
+                statsToggle.title = 'Show Quick Stats';
+            } else {
+                statsCard.classList.add('expanded');
+                statsToggle.classList.add('expanded');
+                statsToggle.title = 'Hide Quick Stats';
+            }
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const statsCard = document.getElementById('statsCard');
+            const statsToggle = document.getElementById('statsToggle');
+            
+            if (window.innerWidth <= 768) {
+                // Mobile: ensure panel can be collapsed
+                if (!statsCard.classList.contains('collapsed')) {
+                    statsCard.classList.add('collapsed');
+                    statsToggle.classList.add('collapsed');
+                    statsToggle.title = 'Show Quick Stats';
+                }
+            }
+        });
         
         console.log('Map initialization complete!');
         
@@ -1252,11 +3146,11 @@
         window.addEventListener('beforeunload', cleanup);
         
         // Initialize map
-        initMap();
+        // initMap();
         
         // Show welcome message
         setTimeout(() => {
-            showToast('Welcome to Cairo Workspaces! 🎉', 'success', 4000);
+            showToast('مرحباً بك في مساحات العمل في أسيوط! 🎉', 'success', 4000);
         }, 1000);
         
         // Add keyboard shortcuts
@@ -1272,6 +3166,11 @@
                 if (directionPanel.classList.contains('show')) {
                     closeDirectionPanel();
                 }
+                // Close tracking panel
+                const trackingPanel = document.getElementById('trackingPanel');
+                if (trackingPanel.classList.contains('show')) {
+                    stopTracking();
+                }
             }
             if (e.key === 'l' || e.key === 'L') {
                 getUserLocation();
@@ -1279,7 +3178,141 @@
             if (e.key === 'f' || e.key === 'F') {
                 fitToBounds();
             }
+            if (e.key === 's' || e.key === 'S') {
+                toggleStatsPanel();
+            }
+            if (e.key === 't' || e.key === 'T') {
+                toggleTrackingPanel();
+            }
+            if (e.key === 'c' || e.key === 'C') {
+                clearRoute();
+            }
         });
+        
+        // Add touch/swipe gestures for mobile
+        let touchStartY = 0;
+        let touchEndY = 0;
+        
+        document.addEventListener('touchstart', function(e) {
+            touchStartY = e.changedTouches[0].screenY;
+        });
+        
+        document.addEventListener('touchend', function(e) {
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipe();
+        });
+        
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const swipeDistance = touchEndY - touchStartY;
+            
+            // Swipe up to show stats panel on mobile
+            if (swipeDistance < -swipeThreshold && window.innerWidth <= 768) {
+                const statsCard = document.getElementById('statsCard');
+                if (statsCard.classList.contains('collapsed')) {
+                    toggleStatsPanel();
+                }
+            }
+            
+            // Swipe down to hide stats panel on mobile
+            if (swipeDistance > swipeThreshold && window.innerWidth <= 768) {
+                const statsCard = document.getElementById('statsCard');
+                if (!statsCard.classList.contains('collapsed')) {
+                    toggleStatsPanel();
+                }
+            }
+        }
+        
+        // Add haptic feedback for mobile devices
+        function hapticFeedback() {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(50);
+            }
+        }
+        
+        // Enhanced button interactions
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('quick-action-btn') || 
+                e.target.classList.contains('route-btn') || 
+                e.target.classList.contains('fab-item') ||
+                e.target.classList.contains('workspace-item')) {
+                hapticFeedback();
+            }
+        });
+        
+        // Add loading states and better feedback
+        function showLoadingState(element, text = 'Loading...') {
+            const originalText = element.textContent;
+            element.textContent = text;
+            element.disabled = true;
+            element.style.opacity = '0.7';
+            
+            return function() {
+                element.textContent = originalText;
+                element.disabled = false;
+                element.style.opacity = '1';
+            };
+        }
+        
+        // Enhanced getUserLocation with loading state
+        const originalGetUserLocation = getUserLocation;
+        getUserLocation = function() {
+            const button = document.getElementById('getLocation');
+            const resetLoading = showLoadingState(button, '⏳ Locating...');
+            
+            originalGetUserLocation();
+            
+            // Reset loading state after 15 seconds (timeout)
+            setTimeout(resetLoading, 15000);
+        };
+        
+        // Add smooth scrolling to workspace list
+        function scrollToWorkspace(workspaceId) {
+            const workspaceItems = document.querySelectorAll('.workspace-item');
+            const targetItem = workspaceItems[workspaceId - 1];
+            
+            if (targetItem) {
+                targetItem.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+                
+                // Add highlight effect
+                targetItem.style.background = 'linear-gradient(135deg, #5baa91 0%, #4a8c7a 100%)';
+                targetItem.style.color = 'white';
+                targetItem.style.transform = 'scale(1.05)';
+                
+                setTimeout(() => {
+                    targetItem.style.background = '';
+                    targetItem.style.color = '';
+                    targetItem.style.transform = '';
+                }, 2000);
+            }
+        }
+        
+        // Enhanced workspace click with scroll
+        function enhancedWorkspaceClick(workspace) {
+            // Scroll to workspace in list
+            scrollToWorkspace(workspace.id);
+            
+            // Center map with animation
+            map.setView([workspace.lat, workspace.lng], 15, {
+                animate: true,
+                duration: 1
+            });
+            
+            // Show popup with delay for better UX
+            setTimeout(() => {
+                workspace.marker.openPopup();
+            }, 500);
+            
+            // If user location is available, show route
+            if (userLocation) {
+                setTimeout(() => {
+                    showDirectionPanel(workspace);
+                }, 800);
+            }
+        }
         
         // UX Enhancement Functions
         
@@ -1403,10 +3436,13 @@
         function addWorkspaceClickHandler(workspace, marker) {
             marker.on('click', function() {
                 // Add pulse effect to clicked marker
-                marker.getElement().classList.add('pulse');
-                setTimeout(() => {
-                    marker.getElement().classList.remove('pulse');
-                }, 2000);
+                const markerElement = marker.getElement();
+                if (markerElement) {
+                    markerElement.classList.add('pulse');
+                    setTimeout(() => {
+                        markerElement.classList.remove('pulse');
+                    }, 2000);
+                }
                 
                 if (userLocation) {
                     showProgress(50);
@@ -1553,12 +3589,24 @@
                     selectedWorkspace.lat, selectedWorkspace.lng
                 );
                 
-                const estimatedSpeed = speed * 3.6; // Convert m/s to km/h
-                const eta = estimatedSpeed > 0 ? remainingDistance / estimatedSpeed * 60 : 0;
+                // Use GPS speed if available, otherwise use route type speed
+                let estimatedSpeed = speed * 3.6; // Convert m/s to km/h
+                if (estimatedSpeed <= 0 || !speed) {
+                    // Use route type speed as fallback
+                    const speeds = {
+                        driving: 30,
+                        walking: 5,
+                        cycling: 15,
+                        motorcycle: 25
+                    };
+                    estimatedSpeed = speeds[currentRouteType] || speeds.driving;
+                }
+                
+                const eta = remainingDistance / estimatedSpeed * 60;
                 
                 document.getElementById('remainingDistance').textContent = formatDistance(remainingDistance);
-                document.getElementById('eta').textContent = eta > 0 ? `${Math.round(eta)} min` : '-';
-                document.getElementById('currentSpeed').textContent = estimatedSpeed > 0 ? `${Math.round(estimatedSpeed)} km/h` : '-';
+                document.getElementById('eta').textContent = eta > 0 ? formatTravelTime(eta) : '-';
+                document.getElementById('currentSpeed').textContent = `${Math.round(estimatedSpeed)} km/h`;
                 document.getElementById('trackingAccuracy').textContent = `±${Math.round(accuracy)}m`;
             }
         }
@@ -1740,29 +3788,15 @@
                     // Create street-level polyline
                     routePolyline = L.polyline(coordinates, {
                         color: '#5baa91',
-                        weight: 8,
-                        opacity: 0.9,
-                        dashArray: '15, 8',
+                        weight: 6,
+                        opacity: 0.8,
+                        dashArray: '20, 10',
                         lineCap: 'round',
                         lineJoin: 'round'
                     }).addTo(map);
                     
-                    // Add street-level direction arrows
-                    for (let i = 0; i < coordinates.length - 1; i += Math.max(1, Math.floor(coordinates.length / 15))) {
-                        const point = coordinates[i];
-                        const nextPoint = coordinates[i + 1];
-                        const bearing = getBearing(point[0], point[1], nextPoint[0], nextPoint[1]);
-                        
-                        const arrowIcon = L.divIcon({
-                            html: `<div style="transform: rotate(${bearing}deg); color: #5baa91; font-size: 18px; background: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">➤</div>`,
-                            className: 'route-arrow',
-                            iconSize: [22, 22],
-                            iconAnchor: [11, 11]
-                        });
-                        
-                        const arrowMarker = L.marker(point, { icon: arrowIcon }).addTo(map);
-                        routeMarkers.push(arrowMarker);
-                    }
+                    // Removed multiple arrows for cleaner design
+                    // Only route line is shown now
                     
                     // Fit map to show entire route
                     const bounds = L.latLngBounds(coordinates);
@@ -1801,6 +3835,295 @@
                 console.error('MapBox routing error:', error);
                 // Fall back to OSRM
                 createRoute(start, end);
+            });
+        }
+
+        // Route type selection
+        let currentRouteType = 'driving';
+        
+        function toggleRouteType(type) {
+            console.log('Route type changed to:', type);
+            currentRouteType = type;
+            
+            // Update button states
+            document.querySelectorAll('.route-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // If there's a current route, recalculate with new type
+            if (selectedWorkspace && userLocation) {
+                console.log('Recalculating route with new type:', type);
+                createRoute(userLocation, [selectedWorkspace.lat, selectedWorkspace.lng], type);
+            }
+            
+            showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} route selected`, 'success');
+        }
+        
+        // Initialize workspace list and search
+        populateWorkspaceList();
+        setupSearch();
+        
+        // Set default route type
+        document.querySelector('.route-btn').classList.add('active');
+        
+        // Enhanced workspace click with scroll
+        function enhancedWorkspaceClick(workspace) {
+            // Scroll to workspace in list
+            scrollToWorkspace(workspace.id);
+            
+            // Center map with animation
+            map.setView([workspace.lat, workspace.lng], 15, {
+                animate: true,
+                duration: 1
+            });
+            
+            // Show popup with delay for better UX
+            setTimeout(() => {
+                workspace.marker.openPopup();
+            }, 500);
+            
+            // If user location is available, show route
+            if (userLocation) {
+                setTimeout(() => {
+                    showDirectionPanel(workspace);
+                }, 800);
+            }
+        }
+        
+        // Help Tooltip System
+        function showTooltip(element, message, duration = 3000) {
+            const tooltip = document.getElementById('helpTooltip');
+            const rect = element.getBoundingClientRect();
+            
+            tooltip.textContent = message;
+            tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
+            tooltip.style.top = rect.top - 50 + 'px';
+            tooltip.classList.add('show');
+            
+            setTimeout(() => {
+                tooltip.classList.remove('show');
+            }, duration);
+        }
+        
+        // Loading Overlay Functions
+        function showLoadingOverlay(message = 'Loading...') {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.add('show');
+        }
+        
+        function hideLoadingOverlay() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.remove('show');
+        }
+        
+        // Welcome Tour Functions
+        function showWelcomeTour() {
+            const tour = document.getElementById('welcomeTour');
+            tour.classList.add('show');
+        }
+        
+        function hideWelcomeTour() {
+            const tour = document.getElementById('welcomeTour');
+            tour.classList.remove('show');
+            localStorage.setItem('tourShown', 'true');
+        }
+        
+        function skipTour() {
+            hideWelcomeTour();
+        }
+        
+        function startTour() {
+            hideWelcomeTour();
+            setTimeout(() => {
+                showTooltip(document.getElementById('statsToggle'), 'انقر هنا لإظهار/إخفاء لوحة الإحصائيات السريعة', 4000);
+                setTimeout(() => {
+                    showTooltip(document.getElementById('getLocation'), 'احصل على موقعك الحالي لبدء الملاحة', 4000);
+                }, 5000);
+            }, 1000);
+        }
+        
+        // Enhanced error handling with user feedback
+        function handleError(error, context = '') {
+            console.error(`Error in ${context}:`, error);
+            
+            let userMessage = 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
+            
+            if (error.message.includes('timeout')) {
+                userMessage = 'انتهت مهلة الطلب. يرجى التحقق من اتصالك.';
+            } else if (error.message.includes('permission')) {
+                userMessage = 'تم رفض إذن الموقع. يرجى تمكين الوصول للموقع.';
+            } else if (error.message.includes('unavailable')) {
+                userMessage = 'خدمة الموقع غير متاحة. يرجى المحاولة لاحقاً.';
+            }
+            
+            showToast(userMessage, 'error');
+            
+            // Add visual feedback
+            const mapElement = document.getElementById('map');
+            mapElement.classList.add('shake');
+            setTimeout(() => {
+                mapElement.classList.remove('shake');
+            }, 500);
+        }
+        
+        // Enhanced success feedback
+        function showSuccessFeedback(element) {
+            element.classList.add('pulse-highlight');
+            setTimeout(() => {
+                element.classList.remove('pulse-highlight');
+            }, 600);
+        }
+        
+        // Auto-hide panels on mobile when map is interacted with
+        map.on('click', function() {
+            if (window.innerWidth <= 768) {
+                const statsCard = document.getElementById('statsCard');
+                if (!statsCard.classList.contains('collapsed')) {
+                    toggleStatsPanel();
+                }
+            }
+        });
+        
+        // Enhanced workspace list population with better UX
+        function populateWorkspaceList() {
+            const workspacesList = document.getElementById('workspacesList');
+            if (!workspacesList) {
+                console.error('Workspaces list container not found!');
+                return;
+            }
+            
+            console.log('Populating workspace list with', workspaces.length, 'workspaces');
+            
+            workspacesList.innerHTML = '';
+            
+            workspaces.forEach((ws, index) => {
+                const workspaceItem = document.createElement('div');
+                workspaceItem.className = 'workspace-item';
+                workspaceItem.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <div style="width: 50px; height: 50px; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                            ${getWorkspaceImageUrl(ws) ? `
+                                <img src="${getWorkspaceImageUrl(ws)}" alt="${ws.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div style="display: none; align-items: center; justify-content: center; width: 100%; height: 100%; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); color: #666; font-size: 1.2rem;">🏢</div>
+                            ` : `
+                                <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); color: #666; font-size: 1.2rem;">🏢</div>
+                            `}
+                        </div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="workspace-name" style="margin-bottom: 4px;">${ws.name}</div>
+                            <div style="font-size: 0.8rem; color: #666; line-height: 1.3;">${ws.description.substring(0, 60)}${ws.description.length > 60 ? '...' : ''}</div>
+                        </div>
+                    </div>
+                    <span class="workspace-badge">${ws.badge}</span>
+                `;
+                
+                workspaceItem.addEventListener('click', () => {
+                    console.log('Workspace clicked:', ws.name);
+                    
+                    // Add haptic feedback
+                    hapticFeedback();
+                    
+                    // Remove previous selection
+                    document.querySelectorAll('.workspace-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    
+                    // Add selection to current item
+                    workspaceItem.classList.add('selected');
+                    
+                    // Use enhanced click function
+                    enhancedWorkspaceClick(ws);
+                    
+                    // Show success feedback
+                    showSuccessFeedback(workspaceItem);
+                });
+                
+                // Add hover tooltip
+                workspaceItem.addEventListener('mouseenter', () => {
+                    if (window.innerWidth > 768) {
+                        showTooltip(workspaceItem, `انقر لعرض ${ws.name}`, 2000);
+                    }
+                });
+                
+                workspacesList.appendChild(workspaceItem);
+            });
+            
+            console.log('Workspace list populated successfully');
+        }
+        
+        // Initialize welcome tour on first visit
+        document.addEventListener('DOMContentLoaded', function() {
+            const tourShown = localStorage.getItem('tourShown');
+            if (!tourShown) {
+                setTimeout(() => {
+                    showWelcomeTour();
+                }, 2000);
+            }
+            
+            // Preload workspace images for better performance
+            setTimeout(() => {
+                preloadWorkspaceImages();
+            }, 1000);
+        });
+        
+        // Update toast messages to Arabic
+        function showToast(message, type = 'info', duration = 3000) {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span>${getToastIcon(type)}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Show toast
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Hide and remove toast
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, duration);
+        }
+        
+        // Update tooltip messages to Arabic
+        function startTour() {
+            hideWelcomeTour();
+            setTimeout(() => {
+                showTooltip(document.getElementById('statsToggle'), 'انقر هنا لإظهار/إخفاء لوحة الإحصائيات السريعة', 4000);
+                setTimeout(() => {
+                    showTooltip(document.getElementById('getLocation'), 'احصل على موقعك الحالي لبدء الملاحة', 4000);
+                }, 5000);
+            }, 1000);
+        }
+        
+        // Preload workspace images for better performance
+        function preloadWorkspaceImages() {
+            workspaces.forEach(ws => {
+                const imageUrl = getWorkspaceImageUrl(ws);
+                if (imageUrl) {
+                    const img = new Image();
+                    img.src = imageUrl;
+                    // Store the preloaded image for potential reuse
+                    ws.preloadedImage = img;
+                    
+                    // Refresh marker when image loads
+                    img.onload = function() {
+                        if (ws.marker) {
+                            // Update the marker icon with the loaded image
+                            ws.marker.setIcon(createWorkspaceIcon(ws));
+                        }
+                    };
+                }
             });
         }
     </script>
