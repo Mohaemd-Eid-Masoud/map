@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <title>خريطة مساحات العمل - ZenZone</title>
+    <title>ZenZone Map</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -156,11 +156,42 @@
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
         
         .panel-close:hover {
-            background: #e9ecef;
-            color: #333;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+        
+        .panel-close:active {
+            transform: scale(0.95);
+        }
+        
+        .panel-close::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+        
+        .panel-close:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .panel-close:focus {
+            outline: 2px solid #ff6b6b;
+            outline-offset: 2px;
         }
         
         /* Panel Content */
@@ -511,107 +542,243 @@
             position: fixed;
             bottom: 30px;
             left: 30px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
             z-index: 1000;
-            min-width: 280px;
-            max-width: 350px;
+            min-width: 320px;
+            max-width: 380px;
             display: none;
             transform: translateY(100%);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #5baa91;
         }
         
         .direction-panel.show {
             display: block;
             transform: translateY(0);
+            animation: slideInUp 0.4s ease-out;
         }
         
         .direction-panel.collapsed {
             transform: translateY(100%);
         }
         
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(100%) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
         .direction-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
             border-bottom: 2px solid #f0f0f0;
+            position: relative;
+        }
+        
+        .direction-header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(135deg, #5baa91 0%, #4a8c7a 100%);
+            border-radius: 1px;
         }
         
         .direction-title {
             font-weight: 700;
             color: #333;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            margin: 0;
         }
         
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #666;
-            padding: 8px;
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: all 0.3s ease;
+        .direction-title::before {
+            content: '🧭';
+            font-size: 1.4rem;
+            animation: compassSpin 3s linear infinite;
         }
         
-        .close-btn:hover {
-            background: #f0f0f0;
-            color: #333;
-            transform: scale(1.1);
+        @keyframes compassSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         .direction-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
-            padding: 8px 0;
+            margin-bottom: 12px;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border-left: 4px solid #5baa91;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .direction-item:hover {
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(91, 170, 145, 0.15);
+        }
+        
+        .direction-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(91, 170, 145, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .direction-item:hover::before {
+            left: 100%;
         }
         
         .direction-label {
-            color: #333;
-            font-size: 0.9rem;
+            color: #555;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .direction-value {
-            font-weight: 600;
+            font-weight: 700;
             color: #5baa91;
+            font-size: 1rem;
+            background: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            border: 1px solid rgba(91, 170, 145, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .direction-value:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(91, 170, 145, 0.2);
         }
         
         .action-button {
             display: inline-block;
             width: 100%;
-            padding: 12px 20px;
+            padding: 15px 20px;
             background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%);
             color: white;
-            border-radius: 6px;
+            border-radius: 12px;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 700;
             text-align: center;
             border: none;
             cursor: pointer;
             font-family: 'Cairo', sans-serif;
-            margin-top: 10px;
+            margin-top: 15px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(91, 170, 145, 0.3);
+        }
+        
+        .action-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
         }
         
         .action-button:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
             color: white;
             text-decoration: none;
+            box-shadow: 0 8px 25px rgba(91, 170, 145, 0.4);
+        }
+        
+        .action-button:hover::before {
+            left: 100%;
+        }
+        
+        .action-button:active {
+            transform: translateY(-1px);
+        }
+        
+        /* Enhanced close button for direction panel */
+        .direction-panel .close-btn {
+            background-color: white !important;
+            border: none !important;
+            font-size: 1.5rem !important;
+            cursor: pointer !important;
+            color: #666 !important;
+            width: 32px !important;
+            height: 32px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 50% !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+            overflow: hidden !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+        }
+        
+        .direction-panel .close-btn:hover {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%) !important;
+            color: white !important;
+            transform: scale(1.1) !important;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3) !important;
+        }
+        
+        .direction-panel .close-btn:active {
+            transform: scale(0.95) !important;
+        }
+        
+        .direction-panel .close-btn::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            width: 0 !important;
+            height: 0 !important;
+            background: rgba(255, 255, 255, 0.2) !important;
+            border-radius: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .direction-panel .close-btn:hover::before {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        .direction-panel .close-btn:focus {
+            outline: 2px solid #ff6b6b !important;
+            outline-offset: 2px !important;
         }
         
         /* Hide attribution */
@@ -787,6 +954,13 @@
             font-size: 24px;
         }
         
+        .fab.over-stats {
+            bottom: auto;
+            top: 120px;
+            right: 30px;
+            z-index: 1002;
+        }
+        
         .fab:hover {
             transform: translateY(-3px) scale(1.05);
             box-shadow: 0 12px 35px rgba(91, 170, 145, 0.6);
@@ -805,6 +979,13 @@
             flex-direction: column;
             gap: 15px;
             z-index: 999;
+        }
+        
+        .fab-menu.over-stats {
+            bottom: auto;
+            top: 190px;
+            right: 30px;
+            z-index: 1001;
         }
         
         .fab-menu.active {
@@ -941,9 +1122,25 @@
                 height: 55px;
             }
             
+            .fab.over-stats {
+                bottom: auto;
+                top: 110px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                z-index: 1002;
+            }
+            
             .fab-menu {
                 bottom: 85px;
                 right: 20px;
+            }
+            
+            .fab-menu.over-stats {
+                bottom: auto;
+                top: 170px;
+                right: 20px;
+                z-index: 1001;
             }
             
             .toast {
@@ -1938,11 +2135,439 @@
         }
         
         /* Image loading states */
+        
+        /* Direction panel close button */
+        .direction-panel .close-btn {
+            background-color: white !important;
+            border: none !important;
+            font-size: 1.5rem !important;
+            cursor: pointer !important;
+            color: #666 !important;
+            width: 32px !important;
+            height: 32px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 50% !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+            overflow: hidden !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+        }
+        
+        .direction-panel .close-btn:hover {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%) !important;
+            color: white !important;
+            transform: scale(1.1) !important;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3) !important;
+        }
+        
+        .direction-panel .close-btn:active {
+            transform: scale(0.95) !important;
+        }
+        
+        .direction-panel .close-btn::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            width: 0 !important;
+            height: 0 !important;
+            background: rgba(255, 255, 255, 0.2) !important;
+            border-radius: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .direction-panel .close-btn:hover::before {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        .direction-panel .close-btn:focus {
+            outline: 2px solid #ff6b6b !important;
+            outline-offset: 2px !important;
+        }
+        
+        /* Mobile responsive close buttons */
+        .direction-panel .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+            padding: 8px;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .direction-panel .close-btn:hover {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+        
+        .direction-panel .close-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .direction-panel .close-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+        
+        .direction-panel .close-btn:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .direction-panel .close-btn:focus {
+            outline: 2px solid #ff6b6b;
+            outline-offset: 2px;
+        }
+        
+        /* Mobile responsive direction panel */
+        @media (max-width: 768px) {
+            .direction-panel {
+                position: fixed;
+                bottom: 20px;
+                left: 15px;
+                right: 15px;
+                width: auto;
+                margin: 0;
+                padding: 20px;
+                min-width: auto;
+                max-width: none;
+                z-index: 1000;
+                border-radius: 20px;
+            }
+            
+            .direction-title {
+                font-size: 1.2rem;
+            }
+            
+            .direction-title::before {
+                font-size: 1.3rem;
+            }
+            
+            .direction-panel .close-btn {
+                width: 42px;
+                height: 42px;
+                font-size: 1.3rem;
+                padding: 12px;
+            }
+            
+            .direction-item {
+                padding: 14px 16px;
+                margin-bottom: 10px;
+            }
+            
+            .direction-label {
+                font-size: 0.9rem;
+            }
+            
+            .direction-value {
+                font-size: 0.95rem;
+                padding: 8px 12px;
+            }
+            
+            .action-button {
+                padding: 16px 20px;
+                font-size: 1rem;
+                min-height: 50px;
+                border-radius: 12px;
+            }
+        }
+        
+        /* Very small screens */
+        @media (max-width: 480px) {
+            .direction-panel {
+                bottom: 15px;
+                left: 10px;
+                right: 10px;
+                padding: 18px;
+                border-radius: 16px;
+            }
+            
+            .direction-title {
+                font-size: 1.1rem;
+            }
+            
+            .direction-title::before {
+                font-size: 1.2rem;
+            }
+            
+            .direction-panel .close-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 1.2rem;
+                padding: 10px;
+            }
+            
+            .direction-item {
+                padding: 12px 14px;
+                margin-bottom: 8px;
+            }
+            
+            .direction-label {
+                font-size: 0.85rem;
+            }
+            
+            .direction-value {
+                font-size: 0.9rem;
+                padding: 6px 10px;
+            }
+            
+            .action-button {
+                padding: 14px 18px;
+                font-size: 0.95rem;
+                min-height: 48px;
+            }
+        }
+        
+        /* Custom Popup Styling */
+        .custom-popup .leaflet-popup-content-wrapper {
+            background: transparent;
+            box-shadow: none;
+            border-radius: 0;
+            padding: 0;
+        }
+        
+        .custom-popup .leaflet-popup-content {
+            margin: 0;
+            padding: 0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            background: white;
+        }
+        
+        .custom-popup .leaflet-popup-tip {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        /* Popup Close Button Styling */
+        .custom-popup button[onclick*="remove()"] {
+            position: absolute !important;
+            top: 15px !important;
+            right: 15px !important;
+            background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%) !important;
+            border: none !important;
+            color: white !important;
+            width: 35px !important;
+            height: 35px !important;
+            border-radius: 50% !important;
+            cursor: pointer !important;
+            font-size: 1.2rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 1000 !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 12px rgba(91, 170, 145, 0.3) !important;
+            font-weight: bold !important;
+        }
+        
+        .custom-popup button[onclick*="remove()"]:hover {
+            background: linear-gradient(135deg, #4a8c7a 0%, #3a7a6a 100%) !important;
+            transform: scale(1.1) !important;
+            box-shadow: 0 6px 20px rgba(91, 170, 145, 0.4) !important;
+        }
+        
+        .custom-popup button[onclick*="remove()"]:active {
+            transform: scale(0.95) !important;
+        }
+        
+        .custom-popup button[onclick*="remove()"]::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            width: 0 !important;
+            height: 0 !important;
+            background: rgba(255, 255, 255, 0.2) !important;
+            border-radius: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .custom-popup button[onclick*="remove()"]:hover::before {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        .custom-popup button[onclick*="remove()"]:focus {
+            outline: 2px solid #5baa91 !important;
+            outline-offset: 2px !important;
+        }
+        
+        /* Popup Action Button Styling */
+        .custom-popup button[onclick*="showDirectionPanelById"] {
+            width: 100% !important;
+            padding: 15px 20px !important;
+            background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 12px !important;
+            cursor: pointer !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 1.1rem !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 6px 20px rgba(91, 170, 145, 0.3) !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        
+        .custom-popup button[onclick*="showDirectionPanelById"]::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: -100% !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent) !important;
+            transition: left 0.5s ease !important;
+        }
+        
+        .custom-popup button[onclick*="showDirectionPanelById"]:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 8px 25px rgba(91, 170, 145, 0.4) !important;
+        }
+        
+        .custom-popup button[onclick*="showDirectionPanelById"]:hover::before {
+            left: 100% !important;
+        }
+        
+        .custom-popup button[onclick*="showDirectionPanelById"]:active {
+            transform: translateY(-1px) !important;
+        }
+        
+        /* Shimmer Animation for Popup Header */
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Popup Content Hover Effects */
+        .custom-popup .leaflet-popup-content > div > div:hover {
+            transform: translateY(-2px);
+            transition: transform 0.3s ease;
+        }
+        
+        /* Mobile Responsive Popup */
+        @media (max-width: 768px) {
+            .custom-popup .leaflet-popup-content {
+                min-width: 280px !important;
+                max-width: 320px !important;
+            }
+            
+            .custom-popup button[onclick*="remove()"] {
+                width: 36px !important;
+                height: 36px !important;
+                font-size: 1.4rem !important;
+            }
+            
+            .custom-popup button[onclick*="showDirectionPanelById"] {
+                padding: 16px 20px !important;
+                font-size: 1rem !important;
+                min-height: 50px !important;
+            }
+        }
+        
+        /* Leaflet Default Popup Close Button Styling */
+        .leaflet-popup-close-button {
+            background-color: white !important;
+            border: none !important;
+            font-size: 1.5rem !important;
+            cursor: pointer !important;
+            color: #666 !important;
+            width: 32px !important;
+            height: 32px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 50% !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+            overflow: hidden !important;
+            text-decoration: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            top: 8px !important;
+            right: 8px !important;
+            z-index: 1000 !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        .leaflet-popup-close-button:hover {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%) !important;
+            color: white !important;
+            transform: scale(1.1) !important;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3) !important;
+        }
+        
+        .leaflet-popup-close-button:active {
+            transform: scale(0.95) !important;
+        }
+        
+        .leaflet-popup-close-button::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            width: 0 !important;
+            height: 0 !important;
+            background: rgba(255, 255, 255, 0.2) !important;
+            border-radius: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .leaflet-popup-close-button:hover::before {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        .leaflet-popup-close-button:focus {
+            outline: 2px solid #ff6b6b !important;
+            outline-offset: 2px !important;
+        }
+        
+        .leaflet-popup-close-button span {
+            position: relative !important;
+            z-index: 1 !important;
+        }
+        
+        /* Ensure popup close button is always visible */
+        .custom-popup .leaflet-popup-close-button {
+            display: flex !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>🌍 مساحات العمل - ZenZone</h1>
+        <h1>ZenZone Map</h1>
         <div class="header-subtitle">اكتشف أحلى مساحات العمل في أسيوط</div>
     </header>
 
@@ -1954,7 +2579,7 @@
     <!-- Collapsible Quick Stats Panel -->
     <div class="stats-card" id="statsCard">
         <div class="panel-header">
-            <h3 class="panel-title">📊 الإحصائيات السريعة</h3>
+            <h3 class="panel-title">📊 توزيع المساحات</h3>
             <button class="panel-close" onclick="toggleStatsPanel()" title="قفل اللوحة">×</button>
         </div>
         
@@ -2095,7 +2720,7 @@
     <div class="panel tracking-panel" id="trackingPanel">
         <div class="panel-header">
             <h3>🧭 الملاحة المباشرة</h3>
-            <button class="close-btn" onclick="stopTracking()">×</button>
+            <button class="panel-close" onclick="closeNavigationPanel()">×</button>
         </div>
         <div class="tracking-content">
             <div class="tracking-status" id="trackingStatus">
@@ -2305,34 +2930,73 @@
             addWorkspaceClickHandler(ws, marker);
             
             marker.bindPopup(`
-                <div style="font-family: 'Cairo', sans-serif; min-width: 280px; max-width: 320px;">
-                    <div style="background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%); margin: -15px -15px 15px -15px; padding: 20px; color: white; border-radius: 12px 12px 0 0;">
-                        <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 8px;">${ws.name}</div>
-                        <div style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 15px; font-size: 0.85rem; display: inline-block; font-weight: 600;">${ws.badge}</div>
+                <div style="font-family: 'Cairo', sans-serif; min-width: 300px; max-width: 350px; position: relative;">
+                    <!-- Header -->
+                    <div style="background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%); 
+                                margin: -15px -15px 20px -15px; padding: 25px 20px 20px 20px; 
+                                color: white; border-radius: 12px 12px 0 0; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+                                    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%); 
+                                    animation: shimmer 2s infinite;"></div>
+                        <div style="font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; position: relative; z-index: 1;">${ws.name}</div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; 
+                                    font-size: 0.9rem; display: inline-block; font-weight: 600; position: relative; z-index: 1;">${ws.badge}</div>
                     </div>
+                    
+                    <!-- Image Section -->
                     ${getWorkspaceImageUrl(ws) ? `
-                        <div style="margin-bottom: 15px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                            <img src="${getWorkspaceImageUrl(ws)}" alt="${ws.name}" style="width: 100%; height: 150px; object-fit: cover; display: block;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                            <div style="display: none; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 60px 20px; text-align: center; color: #666; font-size: 0.9rem;">
-                                <div style="font-size: 2rem; margin-bottom: 10px;">🏢</div>
+                        <div style="margin-bottom: 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.15); position: relative;">
+                            <img src="${getWorkspaceImageUrl(ws)}" alt="${ws.name}" 
+                                 style="width: 100%; height: 180px; object-fit: cover; display: block;" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div style="display: none; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+                                        padding: 80px 20px; text-align: center; color: #666; font-size: 1rem; border-radius: 12px;">
+                                <div style="font-size: 3rem; margin-bottom: 15px;">🏢</div>
                                 <div>صورة مساحة العمل</div>
                             </div>
                         </div>
                     ` : `
-                        <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 40px 20px; text-align: center; color: #666; font-size: 0.9rem; border-radius: 8px; margin-bottom: 15px;">
-                            <div style="font-size: 2rem; margin-bottom: 10px;">🏢</div>
+                        <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+                                    padding: 50px 20px; text-align: center; color: #666; font-size: 1rem; 
+                                    border-radius: 12px; margin-bottom: 20px; border: 2px dashed #dee2e6;">
+                            <div style="font-size: 3rem; margin-bottom: 15px;">🏢</div>
                             <div>مساحة العمل</div>
                         </div>
                     `}
-                    <div style="margin-bottom: 15px; line-height: 1.5; color: #333; font-size: 0.95rem;">${ws.description}</div>
-                    <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #5baa91;">
-                        <div style="font-weight: 600; color: #5baa91; margin-bottom: 5px; font-size: 0.9rem;">📍 Address</div>
-                        <div style="color: #666; font-size: 0.9rem;">Assuit, Egypt</div>
-                        <div style="color: #999; font-size: 0.8rem; margin-top: 3px;">Coordinates: ${ws.lat.toFixed(4)}, ${ws.lng.toFixed(4)}</div>
+                    
+                    <!-- Description -->
+                    <div style="margin-bottom: 20px; line-height: 1.6; color: #333; font-size: 1rem; 
+                                padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #5baa91;">${ws.description}</div>
+                    
+                    <!-- Address Section -->
+                    <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+                                padding: 15px; border-radius: 12px; margin-bottom: 20px; 
+                                border-left: 4px solid #5baa91; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                        <div style="font-weight: 700; color: #5baa91; margin-bottom: 8px; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                            📍 العنوان
+                        </div>
+                        <div style="color: #555; font-size: 0.95rem; margin-bottom: 5px;">أسيوط، مصر</div>
+                        <div style="color: #888; font-size: 0.85rem;">الإحداثيات: ${ws.lat.toFixed(4)}, ${ws.lng.toFixed(4)}</div>
                     </div>
-                    <button onclick="showDirectionPanelById(${ws.id})" style="width: 100%; padding: 12px 16px; background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 1rem; transition: all 0.3s ease;">🧭 Get Directions</button>
+                    
+                    <!-- Single Action Button -->
+                    <button onclick="showDirectionPanelById(${ws.id})" 
+                            style="width: 100%; padding: 15px 20px; background: linear-gradient(135deg, #5baa91 0%, rgba(102, 161, 133, 1) 100%); 
+                                   color: white; border: none; border-radius: 12px; cursor: pointer; 
+                                   font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 1.1rem; 
+                                   transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(91, 170, 145, 0.3);
+                                   position: relative; overflow: hidden; margin-bottom: 10px;">
+                        <span style="position: relative; z-index: 1;">🧭 احصل على الاتجاهات</span>
+                        <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; 
+                                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); 
+                                    transition: left 0.5s ease;"></div>
+                    </button>
                 </div>
-            `);
+            `, {
+                maxWidth: 350,
+                className: 'custom-popup',
+                closeButton: true
+            });
         });
         
         console.log('Workspaces added to map');
@@ -2398,19 +3062,19 @@
             const directionInfo = document.getElementById('directionInfo');
             directionInfo.innerHTML = `
                 <div class="direction-item">
-                    <span class="direction-label">Direct Distance:</span>
+                    <span class="direction-label">📍 المسافة المباشرة</span>
                     <span class="direction-value">${formatDistance(distance)}</span>
                 </div>
                 <div class="direction-item">
-                    <span class="direction-label">Direction:</span>
+                    <span class="direction-label">🧭 الاتجاه</span>
                     <span class="direction-value">${direction}</span>
                 </div>
                 <div class="direction-item">
-                    <span class="direction-label">Bearing:</span>
+                    <span class="direction-label">📐 الزاوية</span>
                     <span class="direction-value">${Math.round(bearing)}°</span>
                 </div>
                 <div class="direction-item">
-                    <span class="direction-label">Coordinates:</span>
+                    <span class="direction-label">🌍 الإحداثيات</span>
                     <span class="direction-value">${workspace.lat.toFixed(4)}, ${workspace.lng.toFixed(4)}</span>
                 </div>
             `;
@@ -2495,23 +3159,23 @@
                     const directionInfo = document.getElementById('directionInfo');
                     directionInfo.innerHTML = `
                         <div class="direction-item">
-                            <span class="direction-label">${routeType.charAt(0).toUpperCase() + routeType.slice(1)} Route:</span>
+                            <span class="direction-label">🚗 مسار ${routeType === 'driving' ? 'بالسيارة' : routeType === 'walking' ? 'ماشي' : routeType === 'cycling' ? 'بالدراجة' : 'بالموتوسيكل'}</span>
                             <span class="direction-value">${formatDistance(distance)}</span>
                         </div>
                         <div class="direction-item">
-                            <span class="direction-label">Estimated Time:</span>
+                            <span class="direction-label">⏱️ الوقت المتوقع</span>
                             <span class="direction-value">${formatTravelTime(calculatedDuration)}</span>
                         </div>
                         <div class="direction-item">
-                            <span class="direction-label">Average Speed:</span>
+                            <span class="direction-label">⚡ السرعة المتوسطة</span>
                             <span class="direction-value">${getAverageSpeed(routeType)}</span>
                         </div>
                         <div class="direction-item">
-                            <span class="direction-label">Route Type:</span>
-                            <span class="direction-value">${routeType.charAt(0).toUpperCase() + routeType.slice(1)}</span>
+                            <span class="direction-label">🎯 نوع المسار</span>
+                            <span class="direction-value">${routeType === 'driving' ? 'سيارة' : routeType === 'walking' ? 'مشي' : routeType === 'cycling' ? 'دراجة' : 'موتوسيكل'}</span>
                         </div>
                         <div class="direction-item">
-                            <span class="direction-label">Coordinates:</span>
+                            <span class="direction-label">🌍 الإحداثيات</span>
                             <span class="direction-value">${end[0].toFixed(4)}, ${end[1].toFixed(4)}</span>
                         </div>
                     `;
@@ -2551,27 +3215,27 @@
                 const directionInfo = document.getElementById('directionInfo');
                 directionInfo.innerHTML = `
                     <div class="direction-item">
-                        <span class="direction-label">Direct Distance:</span>
+                        <span class="direction-label">📍 المسافة المباشرة</span>
                         <span class="direction-value">${formatDistance(distance)}</span>
                     </div>
                     <div class="direction-item">
-                        <span class="direction-label">Estimated Time:</span>
+                        <span class="direction-label">⏱️ الوقت المتوقع</span>
                         <span class="direction-value">${formatTravelTime(calculatedDuration)}</span>
                     </div>
                     <div class="direction-item">
-                        <span class="direction-label">Average Speed:</span>
+                        <span class="direction-label">⚡ السرعة المتوسطة</span>
                         <span class="direction-value">${getAverageSpeed(routeType)}</span>
                     </div>
                     <div class="direction-item">
-                        <span class="direction-label">Direction:</span>
+                        <span class="direction-label">🧭 الاتجاه</span>
                         <span class="direction-value">${direction}</span>
                     </div>
                     <div class="direction-item">
-                        <span class="direction-label">Bearing:</span>
+                        <span class="direction-label">📐 الزاوية</span>
                         <span class="direction-value">${Math.round(fallbackBearing)}°</span>
                     </div>
                     <div class="direction-item">
-                        <span class="direction-label">Coordinates:</span>
+                        <span class="direction-label">🌍 الإحداثيات</span>
                         <span class="direction-value">${end[0].toFixed(4)}, ${end[1].toFixed(4)}</span>
                     </div>
                 `;
@@ -3074,12 +3738,15 @@
         window.pauseTracking = pauseTracking;
         window.resumeTracking = resumeTracking;
         window.stopTracking = stopTracking;
+        window.closeNavigationPanel = closeNavigationPanel;
         window.toggleStatsPanel = toggleStatsPanel;
         
         // Toggle Stats Panel Function
         function toggleStatsPanel() {
             const statsCard = document.getElementById('statsCard');
             const statsToggle = document.getElementById('statsToggle');
+            const fab = document.getElementById('fab');
+            const fabMenu = document.getElementById('fabMenu');
             
             if (statsCard.classList.contains('collapsed')) {
                 // Expand panel
@@ -3089,6 +3756,10 @@
                 statsToggle.classList.add('expanded');
                 statsToggle.innerHTML = '📊';
                 statsToggle.title = 'Hide Quick Stats';
+                
+                // Move FAB over stats panel
+                fab.classList.add('over-stats');
+                fabMenu.classList.add('over-stats');
             } else {
                 // Collapse panel
                 statsCard.classList.remove('expanded');
@@ -3097,6 +3768,10 @@
                 statsToggle.classList.add('collapsed');
                 statsToggle.innerHTML = '📊';
                 statsToggle.title = 'Show Quick Stats';
+                
+                // Move FAB back to bottom
+                fab.classList.remove('over-stats');
+                fabMenu.classList.remove('over-stats');
             }
         }
         
@@ -3104,16 +3779,26 @@
         document.addEventListener('DOMContentLoaded', function() {
             const statsCard = document.getElementById('statsCard');
             const statsToggle = document.getElementById('statsToggle');
+            const fab = document.getElementById('fab');
+            const fabMenu = document.getElementById('fabMenu');
             
             // Start with panel expanded on desktop, collapsed on mobile
             if (window.innerWidth <= 768) {
                 statsCard.classList.add('collapsed');
                 statsToggle.classList.add('collapsed');
                 statsToggle.title = 'Show Quick Stats';
+                
+                // FAB stays at bottom on mobile initially
+                fab.classList.remove('over-stats');
+                fabMenu.classList.remove('over-stats');
             } else {
                 statsCard.classList.add('expanded');
                 statsToggle.classList.add('expanded');
                 statsToggle.title = 'Hide Quick Stats';
+                
+                // FAB positioned over stats panel on desktop
+                fab.classList.add('over-stats');
+                fabMenu.classList.add('over-stats');
             }
         });
         
@@ -3121,6 +3806,8 @@
         window.addEventListener('resize', function() {
             const statsCard = document.getElementById('statsCard');
             const statsToggle = document.getElementById('statsToggle');
+            const fab = document.getElementById('fab');
+            const fabMenu = document.getElementById('fabMenu');
             
             if (window.innerWidth <= 768) {
                 // Mobile: ensure panel can be collapsed
@@ -3128,6 +3815,23 @@
                     statsCard.classList.add('collapsed');
                     statsToggle.classList.add('collapsed');
                     statsToggle.title = 'Show Quick Stats';
+                    
+                    // Move FAB to bottom on mobile
+                    fab.classList.remove('over-stats');
+                    fabMenu.classList.remove('over-stats');
+                }
+            } else {
+                // Desktop: ensure panel is expanded
+                if (statsCard.classList.contains('collapsed')) {
+                    statsCard.classList.remove('collapsed');
+                    statsCard.classList.add('expanded');
+                    statsToggle.classList.remove('collapsed');
+                    statsToggle.classList.add('expanded');
+                    statsToggle.title = 'Hide Quick Stats';
+                    
+                    // Move FAB over stats panel on desktop
+                    fab.classList.add('over-stats');
+                    fabMenu.classList.add('over-stats');
                 }
             }
         });
@@ -3728,24 +4432,39 @@
         function stopTracking() {
             isTracking = false;
             
-            // Reset UI
-            document.getElementById('startTrackingBtn').style.display = 'block';
-            document.getElementById('pauseBtn').style.display = 'none';
-            document.getElementById('resumeBtn').style.display = 'none';
-            document.getElementById('statusDot').className = 'status-dot';
-            document.getElementById('statusText').textContent = 'Ready to track';
+            // Reset UI - check if elements exist before accessing
+            const startTrackingBtn = document.getElementById('startTrackingBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const resumeBtn = document.getElementById('resumeBtn');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const remainingDistance = document.getElementById('remainingDistance');
+            const eta = document.getElementById('eta');
+            const currentSpeed = document.getElementById('currentSpeed');
+            const trackingAccuracy = document.getElementById('trackingAccuracy');
+            const currentInstruction = document.getElementById('currentInstruction');
+            const trackingPanel = document.getElementById('trackingPanel');
+            
+            // Only update UI elements if they exist
+            if (startTrackingBtn) startTrackingBtn.style.display = 'block';
+            if (pauseBtn) pauseBtn.style.display = 'none';
+            if (resumeBtn) resumeBtn.style.display = 'none';
+            if (statusDot) statusDot.className = 'status-dot';
+            if (statusText) statusText.textContent = 'Ready to track';
             
             // Reset tracking info
-            document.getElementById('remainingDistance').textContent = '-';
-            document.getElementById('eta').textContent = '-';
-            document.getElementById('currentSpeed').textContent = '-';
-            document.getElementById('trackingAccuracy').textContent = '-';
+            if (remainingDistance) remainingDistance.textContent = '-';
+            if (eta) eta.textContent = '-';
+            if (currentSpeed) currentSpeed.textContent = '-';
+            if (trackingAccuracy) trackingAccuracy.textContent = '-';
             
             // Reset instruction
-            document.getElementById('currentInstruction').innerHTML = `
-                <div class="instruction-icon">🚶</div>
-                <div class="instruction-text">Start navigation to begin</div>
-            `;
+            if (currentInstruction) {
+                currentInstruction.innerHTML = `
+                    <div class="instruction-icon">🚶</div>
+                    <div class="instruction-text">Start navigation to begin</div>
+                `;
+            }
             
             // Remove tracking polyline
             if (trackingPolyline) {
@@ -3753,19 +4472,36 @@
                 trackingPolyline = null;
             }
             
-            // Reset user marker
-            if (userMarker) {
+            // Reset user marker only if userLocation exists
+            if (userLocation && userMarker) {
                 map.removeLayer(userMarker);
+                userMarker = L.marker(userLocation, { icon: userLocationIcon }).addTo(map);
             }
-            userMarker = L.marker(userLocation, { icon: userLocationIcon }).addTo(map);
             
             // Hide tracking panel
-            document.getElementById('trackingPanel').classList.remove('show');
+            if (trackingPanel) {
+                trackingPanel.classList.remove('show');
+            }
             
             // Restart normal location tracking
             startLocationTracking();
             
             showToast('Navigation stopped', 'info');
+        }
+
+        // Close navigation panel function
+        function closeNavigationPanel() {
+            const trackingPanel = document.getElementById('trackingPanel');
+            if (trackingPanel) {
+                trackingPanel.classList.remove('show');
+            }
+            
+            // If tracking is active, stop it
+            if (isTracking) {
+                stopTracking();
+            }
+            
+            showToast('Navigation panel closed', 'info');
         }
 
         // Alternative street routing with MapBox
